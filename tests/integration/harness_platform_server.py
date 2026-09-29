@@ -75,7 +75,7 @@ def start_platform_server(
             stderr = (process.stderr.read() if process.stderr else b"").decode()
             raise RuntimeError(f"platform server exited early: {stderr}")
         try:
-            response = httpx.get(f"{base_url}/api/platform/v0/readyz", timeout=2.0)
+            response = httpx.get(f"{base_url}/api/platform/v0/readyz", timeout=2.0, trust_env=False)
             if response.status_code == 200 and response.json().get("status") == "ready":
                 return PlatformServer(
                     base_url=base_url,
@@ -123,4 +123,6 @@ def platform_request(
 ) -> httpx.Response:
     url = f"{server.base_url.rstrip('/')}{path}"
     headers = {"authorization": f"Bearer {token}"}
-    return httpx.request(method, url, headers=headers, json=json_body, timeout=30.0)
+    return httpx.request(
+        method, url, headers=headers, json=json_body, timeout=30.0, trust_env=False
+    )

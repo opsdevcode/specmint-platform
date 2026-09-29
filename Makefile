@@ -5,12 +5,12 @@ export PYTHONPATH := src
 .PHONY: format lint typecheck quality security test package release-check cue-install cue-check
 
 format:
-	$(PYTHON) -m ruff format src tests
-	$(PYTHON) -m ruff check --fix src tests
+	$(PYTHON) -m ruff format src tests scripts
+	$(PYTHON) -m ruff check --fix src tests scripts
 
 lint:
-	$(PYTHON) -m ruff check src tests
-	$(PYTHON) -m ruff format --check src tests
+	$(PYTHON) -m ruff check src tests scripts
+	$(PYTHON) -m ruff format --check src tests scripts
 
 typecheck:
 	$(PYTHON) -m mypy src

@@ -20,9 +20,9 @@ jobs:
       - name: Install
         run: pip install --no-cache-dir -e ".[dev]"
       - name: Ruff lint
-        run: ruff check src tests
+        run: ruff check src tests scripts
       - name: Ruff format
-        run: ruff format --check src tests
+        run: ruff format --check src tests scripts
       - name: mypy
         run: mypy src
       - name: Bandit

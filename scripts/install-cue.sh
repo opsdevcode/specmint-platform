@@ -57,6 +57,6 @@ if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
   exit 1
 fi
 
-tar -xzf "${WORKDIR}/${ASSET}" -C "${WORKDIR}"
+tar --no-same-owner -xzf "${WORKDIR}/${ASSET}" -C "${WORKDIR}"
 install -m 0755 "${WORKDIR}/cue" "${ROOT}/tools/cue"
 "${ROOT}/tools/cue" version | grep -F "v${VERSION}"

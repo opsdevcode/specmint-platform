@@ -16,16 +16,18 @@ mutation. Ambient GitHub credentials are ignored.
 
 ## Quick start
 
-```bash
-python3 -m pip install -e ".[dev,durable]"
-make cue-install
-make quality && make test
-docker compose up --build
-```
+Start with [your first governed local change](docs/quickstart.md). Install
+the public source in a Python 3.12 virtual environment, start a loopback
+API, and run `python scripts/demo_fake_lifecycle.py`.
 
-Compose starts PostgreSQL, applies migrations, and serves the API on
-`http://127.0.0.1:8080`. Image tag for releases:
-`ghcr.io/opsdevcode/specmint:0.1.0-alpha.1` (no `latest`).
+The walkthrough compiles intent, plans a change, demonstrates refusal
+without approval, executes through a fake provider, retries the request,
+and saves simulated verification and evidence for inspection. No Repave
+installation, private credentials, cloud account, or Docker is required.
+All changes are fictional; this is not live execution or a compliance audit.
+
+The guide also includes an optional PostgreSQL/Compose path built from
+source. For development checks, see [Contributing](CONTRIBUTING.md).
 
 ## Default safety
 
