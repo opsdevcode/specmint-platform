@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -107,7 +108,22 @@ class PostgresStore:
             )
 
     def put_governance(self, record: GovernanceRecord, *, expected_revision: int) -> int:
+        attempt = 0
+        while True:
+            try:
+                return self._put_governance_once(record, expected_revision=expected_revision)
+            except Exception as exc:
+                attempt += 1
+                if attempt >= _DEADLOCK_ATTEMPTS or not _is_deadlock(exc):
+                    raise
+
+    def _put_governance_once(self, record: GovernanceRecord, *, expected_revision: int) -> int:
         with self._transaction() as cur:
+            # Concurrent INSERT ... ON CONFLICT still speculative-locks the
+            # partial idempotency indexes. Two writers of the same record
+            # deadlock on uq_platform_run_idempotency. Serialize them first
+            # so the loser observes the committed revision.
+            _lock_governance(cur, record.tenant, record.record_id)
             cur.execute(
                 """
                 SELECT document, revision, lifecycle_status
@@ -334,6 +350,22 @@ class PostgresStore:
 _SECRET_KEYS = frozenset(
     {"authorization", "password", "secret", "token", "apikey", "api_key", "credential", "headers"}
 )
+
+
+_DEADLOCK_ATTEMPTS = 3
+
+
+def _lock_governance(cur: Any, tenant: str, record_id: str) -> None:
+    digest = hashlib.sha256(f"{tenant}\n{record_id}".encode()).digest()
+    key1 = int.from_bytes(digest[:4], "big", signed=True)
+    key2 = int.from_bytes(digest[4:8], "big", signed=True)
+    cur.execute("SELECT pg_advisory_xact_lock(%s, %s)", (key1, key2))
+
+
+def _is_deadlock(exc: BaseException) -> bool:
+    if type(exc).__name__ == "DeadlockDetected":
+        return True
+    return getattr(exc, "sqlstate", None) == "40P01"
 
 
 def _import_psycopg() -> Any:
