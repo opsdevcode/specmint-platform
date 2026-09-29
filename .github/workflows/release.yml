@@ -17,11 +17,14 @@ jobs:
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: "3.12"
-      - name: Install
+      - name: Install specmint (dev)
         run: pip install --no-cache-dir -e ".[dev]"
+      - name: Install pinned CUE
+        run: bash scripts/install-cue.sh
       - name: Tests
         env:
           PYTHONPATH: src
+          CUE_BIN: ${{ github.workspace }}/tools/cue
         run: python -m pytest -q -m "not integration" --strict-markers
       - name: Build Python dist
         run: python -m build --sdist --wheel --outdir dist
