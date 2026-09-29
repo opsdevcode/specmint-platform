@@ -189,6 +189,7 @@ def test_idempotency_and_cas_conflicts(service: PlatformService) -> None:
 
 
 def test_concurrent_approval_and_execution(service: PlatformService) -> None:
+    """Same-key concurrent runs must not deadlock on the run idempotency index."""
     planner = _owner_caller()
     approver = _approver_caller()
     executor = _executor_caller()

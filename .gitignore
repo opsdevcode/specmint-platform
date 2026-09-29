@@ -11,3 +11,4 @@ build/
 tools/cue
 .python-version
 src/*.egg-info/
+demo-output/

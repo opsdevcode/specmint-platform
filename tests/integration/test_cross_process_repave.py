@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import json
+import os
+import subprocess
+import sys
 from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -16,6 +21,29 @@ from tests.integration.harness_platform_server import (
 from opsdevcode_specmint.platform.fixtures import MINT_SETTINGS, complete_snapshot
 
 pytestmark = pytest.mark.integration
+
+
+def test_public_quickstart_with_postgres(platform_server: PlatformServer, tmp_path: Path) -> None:
+    script = Path(__file__).resolve().parents[2] / "scripts" / "demo_fake_lifecycle.py"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--base-url",
+            platform_server.base_url,
+            "--output-dir",
+            str(tmp_path),
+        ],
+        env={**os.environ, "SPECMINT_FIXTURE_IDENTITY_SECRET": platform_server.fixture_secret},
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    summaries = list(tmp_path.glob("*/summary.json"))
+    assert len(summaries) == 1
+    assert json.loads(summaries[0].read_text())["retryReturnedExistingResult"] is True
 
 
 @pytest.fixture(scope="module")
