@@ -26,6 +26,15 @@ CONTRACT_OWNERS: dict[str, str] = {
     "opsdevcode.budget-decision/v0": "toll",
     "opsdevcode.environment-lifecycle/v0": "overpass",
     "opsdevcode.sandbox-request/v0": "specmint",
+    "opsdevcode.capability-manifest/v1alpha1": "specmint",
+    "opsdevcode.environment-contract/v1alpha1": "overpass",
+    "opsdevcode.composite-plan/v1alpha1": "specmint",
+    "opsdevcode.composite-approval/v1alpha1": "specmint",
+    "opsdevcode.composite-execution/v1alpha1": "specmint",
+    "opsdevcode.composite-verification/v1alpha1": "specmint",
+    "opsdevcode.composite-evidence/v1alpha1": "specmint",
+    "opsdevcode.relay-transport/v1alpha1": "relay",
+    "opsdevcode.repave-snapshot-contribution/v1alpha1": "repave",
 }
 
 TRUST_FIELDS = ("issuer", "subject", "digestAlgorithm")

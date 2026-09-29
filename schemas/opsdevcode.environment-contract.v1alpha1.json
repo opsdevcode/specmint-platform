@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsdevcode.dev/schemas/opsdevcode.environment-contract.v1alpha1.json",
+  "title": "opsdevcode.environment-contract/v1alpha1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "mode", "providers", "iacStrategy", "maxLifetimeHours", "teardownPolicy"],
+  "properties": {
+    "schema": { "const": "opsdevcode.environment-contract/v1alpha1" },
+    "mode": { "const": "fake-local" },
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["aws", "gcp", "kubernetes", "terraform", "pulumi", "crossplane"]
+      }
+    },
+    "iacStrategy": { "enum": ["terraform", "pulumi", "crossplane"] },
+    "maxLifetimeHours": { "type": "integer", "minimum": 1 },
+    "teardownPolicy": { "enum": ["destroy", "retain"] }
+  }
+}

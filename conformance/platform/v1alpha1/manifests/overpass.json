@@ -1,0 +1,27 @@
+{
+  "apiVersion": "opsdevcode.capability-manifest/v1alpha1",
+  "kind": "CapabilityManifest",
+  "metadata": { "product": "overpass", "revision": "v1alpha1" },
+  "spec": {
+    "purpose": "Infrastructure environment lifecycle",
+    "mode": "fake-local",
+    "capabilities": [
+      {
+        "capabilityId": "infrastructure.lifecycle",
+        "versions": ["v0", "v1alpha1"],
+        "targetKinds": ["aws", "gcp", "kubernetes", "terraform", "pulumi", "crossplane"],
+        "observation": true,
+        "planning": true,
+        "execution": true,
+        "verification": true,
+        "rollback": true,
+        "approvalSchema": "opsdevcode.approval-requirement/v0",
+        "evidenceSchema": "opsdevcode.evidence-envelope/v0"
+      }
+    ],
+    "contracts": [
+      { "schema": "opsdevcode.environment-contract/v1alpha1", "owner": "overpass" },
+      { "schema": "opsdevcode.environment-lifecycle/v0", "owner": "overpass" }
+    ]
+  }
+}

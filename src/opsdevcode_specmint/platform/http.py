@@ -123,6 +123,20 @@ def register_platform_routes(app: FastAPI) -> None:
         body = await _json(request)
         return _SERVICE.compose(body, caller=_caller(request, body))
 
+    @app.post("/api/platform/v1alpha1/compose")
+    async def post_compose_v1alpha1(request: Request) -> dict[str, Any]:
+        body = await _json(request)
+        caller = _caller(request, body)
+        return _SERVICE.compose_v1alpha1(
+            caller=caller,
+            environment=dict(body.get("environment") or {}),
+            budget=dict(body.get("budget") or {}),
+            notification=dict(body.get("notification") or {}),
+            snapshot=body.get("snapshot") if isinstance(body.get("snapshot"), dict) else None,
+            approve=bool(body.get("approve", True)),
+            teardown_fails=bool(body.get("teardownFails", False)),
+        )
+
     @app.get("/api/platform/v0/healthz")
     def platform_health() -> dict[str, str]:
         return {"status": "ok", "surface": "platform"}

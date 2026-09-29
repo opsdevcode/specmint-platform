@@ -1,0 +1,13 @@
+{
+  "apiVersion": "opsdevcode.capability-manifest/v1alpha1",
+  "kind": "CapabilityManifest",
+  "metadata": { "product": "relay", "revision": "v1alpha1" },
+  "spec": {
+    "purpose": "Internal notification transport (not a public product)",
+    "mode": "fake-local",
+    "capabilities": [],
+    "contracts": [
+      { "schema": "opsdevcode.relay-transport/v1alpha1", "owner": "relay" }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "apiVersion": "opsdevcode.capability-manifest/v1alpha1",
+  "kind": "CapabilityManifest",
+  "metadata": { "product": "specmint", "revision": "v1alpha1" },
+  "spec": {
+    "purpose": "Mint intent compilation and composite lifecycle assembly",
+    "mode": "fake-local",
+    "capabilities": [
+      {
+        "capabilityId": "specmint.compile",
+        "versions": ["v0", "v1alpha1"],
+        "targetKinds": ["mint"],
+        "observation": false,
+        "planning": true,
+        "execution": false,
+        "verification": true,
+        "rollback": false,
+        "approvalSchema": "opsdevcode.approval-requirement/v0",
+        "evidenceSchema": "opsdevcode.evidence-envelope/v0"
+      }
+    ],
+    "contracts": [
+      { "schema": "opsdevcode.capability-manifest/v1alpha1", "owner": "specmint" },
+      { "schema": "opsdevcode.composite-plan/v1alpha1", "owner": "specmint" }
+    ]
+  }
+}

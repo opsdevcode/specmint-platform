@@ -43,7 +43,8 @@ Compose starts PostgreSQL, applies migrations, and serves the API on
 Compiler: `POST /api/specifications/v1/{validate,compile,inspect}`,
 `GET /healthz`, `GET /readyz`.
 
-Platform: `/api/platform/v0/{compile,capabilities,snapshots,plans,approvals,runs,verifications,evidence,sandbox,healthz,readyz}`.
+Platform: `/api/platform/v0/{compile,capabilities,snapshots,plans,approvals,runs,verifications,evidence,sandbox,healthz,readyz}`,
+`POST /api/platform/v1alpha1/compose`.
 
 OpenAPI: `GET /openapi.json`.
 

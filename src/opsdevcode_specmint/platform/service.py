@@ -23,6 +23,7 @@ from opsdevcode_specmint.platform.authn import (
     ensure_verification_authority,
     has_role,
 )
+from opsdevcode_specmint.platform.composite import CompositeInputs, run_composite_lifecycle
 from opsdevcode_specmint.platform.contracts import envelope, require_no_secrets
 from opsdevcode_specmint.platform.digest import content_digest
 from opsdevcode_specmint.platform.errors import refuse
@@ -52,7 +53,9 @@ from opsdevcode_specmint.platform.lifecycle import (
     ensure_transition,
     initial_plan_status,
 )
+from opsdevcode_specmint.platform.manifest import CapabilityManifest
 from opsdevcode_specmint.platform.metrics import LifecycleTimer
+from opsdevcode_specmint.platform.object_store import MemoryObjectStore, ObjectStore
 from opsdevcode_specmint.platform.persistence import (
     ConcurrentRevision,
     MemoryStore,
@@ -79,6 +82,8 @@ class PlatformService:
     provider: FakeGithubProvider
     identity_verifier: IdentityVerifier | None = None
     allow_self_approve: bool = False
+    object_store: ObjectStore | None = None
+    manifests: tuple[CapabilityManifest, ...] = ()
 
     @classmethod
     def in_memory(cls, *, grants: frozenset[tuple[str, str]] | None = None) -> PlatformService:
@@ -112,6 +117,7 @@ class PlatformService:
             provider=FakeGithubProvider(),
             identity_verifier=FixtureIdentityProvider.for_tests(allow_self_approve=True),
             allow_self_approve=True,
+            object_store=MemoryObjectStore(),
         )
 
     def compile_intent(self, source: str, *, caller: CallerIdentity) -> dict[str, Any]:
@@ -550,6 +556,33 @@ class PlatformService:
             registry=self.registry,
             entitled_products=frozenset(products),
             **kwargs,
+        )
+
+    def compose_v1alpha1(
+        self,
+        *,
+        caller: CallerIdentity,
+        environment: dict[str, Any],
+        budget: dict[str, Any],
+        notification: dict[str, Any],
+        snapshot: dict[str, Any] | None = None,
+        approve: bool = True,
+        teardown_fails: bool = False,
+    ) -> dict[str, Any]:
+        store = self.object_store or MemoryObjectStore()
+        return run_composite_lifecycle(
+            caller=caller,
+            registry=self.registry,
+            manifests=self.manifests,
+            inputs=CompositeInputs(
+                environment=environment,
+                budget=budget,
+                notification=notification,
+                snapshot=snapshot,
+                approve=approve,
+            ),
+            object_store=store,
+            teardown_fails=teardown_fails,
         )
 
     def _entitle(self, caller: CallerIdentity, capability_id: str, *, target_kind: str) -> None:

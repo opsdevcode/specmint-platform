@@ -1,0 +1,26 @@
+{
+  "apiVersion": "opsdevcode.capability-manifest/v1alpha1",
+  "kind": "CapabilityManifest",
+  "metadata": { "product": "toll", "revision": "v1alpha1" },
+  "spec": {
+    "purpose": "Economic budget guardrails",
+    "mode": "fake-local",
+    "capabilities": [
+      {
+        "capabilityId": "economics.budget.guard",
+        "versions": ["v0", "v1alpha1"],
+        "targetKinds": ["sandbox"],
+        "observation": false,
+        "planning": true,
+        "execution": false,
+        "verification": false,
+        "rollback": false,
+        "approvalSchema": "opsdevcode.approval-requirement/v0",
+        "evidenceSchema": "opsdevcode.evidence-envelope/v0"
+      }
+    ],
+    "contracts": [
+      { "schema": "opsdevcode.budget-decision/v0", "owner": "toll" }
+    ]
+  }
+}
