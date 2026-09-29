@@ -1,0 +1,26 @@
+{
+  "apiVersion": "opsdevcode.capability-manifest/v1alpha1",
+  "kind": "CapabilityManifest",
+  "metadata": { "product": "dispatch", "revision": "v1alpha1" },
+  "spec": {
+    "purpose": "Human workflow notification intents",
+    "mode": "fake-local",
+    "capabilities": [
+      {
+        "capabilityId": "dispatch.notify",
+        "versions": ["v0", "v1alpha1"],
+        "targetKinds": ["email", "slack", "teams"],
+        "observation": false,
+        "planning": true,
+        "execution": true,
+        "verification": false,
+        "rollback": false,
+        "approvalSchema": "opsdevcode.approval-requirement/v0",
+        "evidenceSchema": "opsdevcode.evidence-envelope/v0"
+      }
+    ],
+    "contracts": [
+      { "schema": "opsdevcode.notification-request/v0", "owner": "dispatch" }
+    ]
+  }
+}

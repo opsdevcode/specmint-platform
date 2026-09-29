@@ -127,7 +127,7 @@ def builtin_descriptors() -> tuple[CapabilityDescriptor, ...]:
     repo = CapabilityDescriptor(
         capability_id="repo.github.governance",
         owner_product="repave",
-        versions=("v0",),
+        versions=("v0", "v1alpha1"),
         target_kinds=("repo.github",),
         observation=True,
         planning=True,
@@ -140,7 +140,7 @@ def builtin_descriptors() -> tuple[CapabilityDescriptor, ...]:
     infra = CapabilityDescriptor(
         capability_id="infrastructure.lifecycle",
         owner_product="overpass",
-        versions=("v0",),
+        versions=("v0", "v1alpha1"),
         target_kinds=("aws", "gcp", "kubernetes", "terraform", "pulumi", "crossplane"),
         observation=True,
         planning=True,
@@ -153,7 +153,7 @@ def builtin_descriptors() -> tuple[CapabilityDescriptor, ...]:
     budget = CapabilityDescriptor(
         capability_id="economics.budget.guard",
         owner_product="toll",
-        versions=("v0",),
+        versions=("v0", "v1alpha1"),
         target_kinds=("sandbox",),
         observation=False,
         planning=True,
@@ -166,7 +166,7 @@ def builtin_descriptors() -> tuple[CapabilityDescriptor, ...]:
     notify = CapabilityDescriptor(
         capability_id="dispatch.notify",
         owner_product="dispatch",
-        versions=("v0",),
+        versions=("v0", "v1alpha1"),
         target_kinds=("email", "slack", "teams"),
         observation=False,
         planning=True,
@@ -179,7 +179,7 @@ def builtin_descriptors() -> tuple[CapabilityDescriptor, ...]:
     compile_cap = CapabilityDescriptor(
         capability_id="specmint.compile",
         owner_product="specmint",
-        versions=("v0",),
+        versions=("v0", "v1alpha1"),
         target_kinds=("mint",),
         observation=False,
         planning=True,

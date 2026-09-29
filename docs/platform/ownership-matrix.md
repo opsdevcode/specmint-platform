@@ -74,6 +74,24 @@ environment-lifecycle:
     consumers sandbox composition
     disposition new stub; inventory/relate/drift/commit unchanged
 
+capability-manifest:
+    owner specmint schema; each product emits its own document
+    version opsdevcode.capability-manifest/v1alpha1
+    consumers specmint federated registry
+    disposition federated JSON; no product source imports
+
+environment-contract:
+    owner overpass
+    version opsdevcode.environment-contract/v1alpha1
+    consumers specmint composite lifecycle
+    disposition fake-local only
+
+object-storage:
+    owner specmint slice
+    version local MemoryObjectStore / LocalDirectoryObjectStore
+    consumers composite evidence
+    disposition no live cloud providers
+
 opsdevcode_capabilities:
     owner repave
     version in-tree package

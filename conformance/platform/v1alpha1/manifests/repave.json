@@ -1,0 +1,26 @@
+{
+  "apiVersion": "opsdevcode.capability-manifest/v1alpha1",
+  "kind": "CapabilityManifest",
+  "metadata": { "product": "repave", "revision": "v1alpha1" },
+  "spec": {
+    "purpose": "Governed repository observation and contribution",
+    "mode": "fake-local",
+    "capabilities": [
+      {
+        "capabilityId": "repo.github.governance",
+        "versions": ["v0", "v1alpha1"],
+        "targetKinds": ["repo.github"],
+        "observation": true,
+        "planning": true,
+        "execution": true,
+        "verification": true,
+        "rollback": false,
+        "approvalSchema": "opsdevcode.approval-requirement/v0",
+        "evidenceSchema": "opsdevcode.evidence-envelope/v0"
+      }
+    ],
+    "contracts": [
+      { "schema": "opsdevcode.repave-snapshot-contribution/v1alpha1", "owner": "repave" }
+    ]
+  }
+}
