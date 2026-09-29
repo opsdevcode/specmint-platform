@@ -87,3 +87,15 @@ ignore_missing_imports = true
 [tool.bandit]
 exclude_dirs = ["tests"]
 skips = ["B603", "B404"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+tag_format = "v{version}"
+commit_message = "chore(release): {version}"
+upload_to_vcs_release = false
+upload_to_pypi = false
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = true
+prerelease_token = "alpha"
