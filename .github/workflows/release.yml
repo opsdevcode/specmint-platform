@@ -2,48 +2,105 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "LICENSE"
+      - "CHANGELOG.md"
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
-    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Install specmint (dev)
-        run: pip install --no-cache-dir -e ".[dev]"
-      - name: Install pinned CUE
-        run: bash scripts/install-cue.sh
+
+      - name: Install package, tests, and semantic-release
+        run: |
+          pip install --no-cache-dir -e ".[dev]"
+          pip install --no-cache-dir "python-semantic-release~=10.0" build
+          bash scripts/install-cue.sh
+
+      - id: rel
+        name: Resolve version and skip if GitHub Release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git fetch --tags origin
+
+          psr() {
+            env -u GITHUB_OUTPUT semantic-release "$@"
+          }
+
+          VERSION="$(psr version --print)"
+          PY_VERSION="$(python -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          if [[ "${VERSION}" == 1.* ]]; then
+            echo "PSR printed ${VERSION}; staying on ${PY_VERSION} (do not tag v1.0.0)."
+            VERSION="${PY_VERSION}"
+          fi
+          echo "version=${VERSION}" >>"${GITHUB_OUTPUT}"
+
+          candidates=("v${VERSION}")
+          if [[ "${VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)a([0-9]+)$ ]]; then
+            candidates+=("v${BASH_REMATCH[1]}-alpha.${BASH_REMATCH[2]}")
+          fi
+          if [[ "${VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-alpha\.([0-9]+)$ ]]; then
+            candidates+=("v${BASH_REMATCH[1]}a${BASH_REMATCH[2]}")
+          fi
+
+          for tag in "${candidates[@]}"; do
+            if gh release view "${tag}" >/dev/null 2>&1; then
+              echo "GitHub release ${tag} already exists; skip rebuild."
+              echo "tag=${tag}" >>"${GITHUB_OUTPUT}"
+              echo "created=false" >>"${GITHUB_OUTPUT}"
+              exit 0
+            fi
+          done
+
+          echo "tag=v${VERSION}" >>"${GITHUB_OUTPUT}"
+          echo "created=true" >>"${GITHUB_OUTPUT}"
+
       - name: Tests
+        if: steps.rel.outputs.created == 'true'
         env:
           PYTHONPATH: src
           CUE_BIN: ${{ github.workspace }}/tools/cue
         run: python -m pytest -q -m "not integration" --strict-markers
+
       - name: Build Python dist
+        if: steps.rel.outputs.created == 'true'
         run: python -m build --sdist --wheel --outdir dist
-      - name: Record dist digests
-        run: |
-          python - <<'PY'
-          import hashlib, pathlib
-          for path in sorted(pathlib.Path("dist").glob("*")):
-              digest = hashlib.sha256(path.read_bytes()).hexdigest()
-              print(f"{digest}  {path.name}")
-          PY
-      - name: Create GitHub Release (prerelease)
+
+      - name: Create GitHub Release
+        if: steps.rel.outputs.created == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.rel.outputs.tag }}
         run: |
           set -euo pipefail
-          gh release create "${TAG}" \
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} exists without a GitHub release; creating it."
+          else
+            git tag "${TAG}" "${GITHUB_SHA}"
+            git push origin "refs/tags/${TAG}"
+          fi
+          gh release create "${TAG}" dist/* \
             --prerelease \
             --title "SpecMint ${TAG#v}" \
             --notes "SpecMint platform ${TAG}. Fake providers by default. mint apply is not included. Hosted service stays private. Mint language: https://github.com/opsdevcode/specmint-language" \
-            dist/*
+            --target "${GITHUB_SHA}"
