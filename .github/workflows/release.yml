@@ -48,6 +48,11 @@ jobs:
           }
 
           VERSION="$(psr version --print)"
+          PY_VERSION="$(python -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          if [[ "${VERSION}" == 1.* ]]; then
+            echo "PSR printed ${VERSION}; staying on ${PY_VERSION} (do not tag v1.0.0)."
+            VERSION="${PY_VERSION}"
+          fi
           echo "version=${VERSION}" >>"${GITHUB_OUTPUT}"
 
           candidates=("v${VERSION}")
