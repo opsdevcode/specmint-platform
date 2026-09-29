@@ -1,0 +1,5 @@
+{
+  "code": "MINT_UNSUPPORTED_EXTENSION",
+  "message": "unsupported extension version",
+  "rendered": "MINT_UNSUPPORTED_EXTENSION at main.mint:3:1: unsupported extension version ext.sample v2alpha1; registry has ext.sample v1alpha1"
+}

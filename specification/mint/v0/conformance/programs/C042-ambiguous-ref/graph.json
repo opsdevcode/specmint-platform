@@ -1,0 +1,8 @@
+{
+  "root": "main.mint",
+  "units": [
+    "main.mint",
+    "a.mint",
+    "b.mint"
+  ]
+}

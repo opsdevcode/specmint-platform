@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: specmint
+      POSTGRES_PASSWORD: specmint_dev_not_prod
+      POSTGRES_DB: specmint
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U specmint -d specmint"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPECMINT_DATABASE_URL: postgresql://specmint:specmint_dev_not_prod@postgres:5432/specmint
+      SPECMINT_ENV: development
+      SPECMINT_ALLOW_MEMORY_STORE: "0"
+    command: ["python", "-m", "opsdevcode_specmint", "platform", "migrate"]
+
+  api:
+    build: .
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPECMINT_DATABASE_URL: postgresql://specmint:specmint_dev_not_prod@postgres:5432/specmint
+      SPECMINT_ENV: development
+      SPECMINT_BOOTSTRAP: "1"
+      SPECMINT_FIXTURE_IDENTITY: "1"
+      SPECMINT_FIXTURE_IDENTITY_SECRET: local-compose-fixture-not-for-production-v0
+      SPECMINT_ALLOW_SELF_APPROVE: "0"
+      SPECMINT_ALLOW_MEMORY_STORE: "0"
+      BIND_HOST: 0.0.0.0
+      PORT: "8080"

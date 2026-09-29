@@ -1,0 +1,1 @@
+{"catalogDigest":"sha256:d5f3e70d720275895b512e9ec5a8fc52ad6f35f96497249d6d3df27ccfad1e94","edition":"v0","extensions":[],"irDigest":"sha256:20a191b98c0cc869b129d65b0ae7b0203549ea9b8cabc5327cb4f98563e5f575","name":"minimal","root":"main.mint","schema":"mint.lock/v0","units":[{"digest":"sha256:369ac920bb49b4f46335efbe0daa8c8f3265b83e644b427a9fff9a653d1d9547","path":"main.mint"}]}

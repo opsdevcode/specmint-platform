@@ -1,0 +1,40 @@
+{
+  "root": "main.mint",
+  "units": [
+    "main.mint"
+  ],
+  "extensions": [
+    {
+      "namespace": "ext.sample",
+      "version": "v1alpha1",
+      "capabilities": [
+        {
+          "type": "ext.sample.tag",
+          "version": "v1alpha1",
+          "targetKinds": [
+            "sandbox"
+          ]
+        }
+      ],
+      "metadataNamespaces": [
+        "ext.sample"
+      ]
+    },
+    {
+      "namespace": "ext.sample",
+      "version": "v1alpha1",
+      "capabilities": [
+        {
+          "type": "ext.sample.tag",
+          "version": "v1alpha1",
+          "targetKinds": [
+            "sandbox"
+          ]
+        }
+      ],
+      "metadataNamespaces": [
+        "ext.sample"
+      ]
+    }
+  ]
+}

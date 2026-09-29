@@ -1,0 +1,5 @@
+{
+  "code": "MINT_DUPLICATE_EXTENSION",
+  "message": "already registered",
+  "rendered": "MINT_DUPLICATE_EXTENSION: extension namespace ext.sample is already registered; keep one extension per namespace"
+}

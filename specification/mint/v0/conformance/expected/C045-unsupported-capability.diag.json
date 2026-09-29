@@ -1,0 +1,5 @@
+{
+  "code": "MINT_PARTIAL_SUPPORT",
+  "message": "only partially supported",
+  "rendered": "MINT_PARTIAL_SUPPORT at root:10:1: capability aws.account.audit v1alpha1 is only partially supported; do not require it until support is full"
+}

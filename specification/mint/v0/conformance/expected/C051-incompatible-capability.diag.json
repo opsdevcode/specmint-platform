@@ -1,0 +1,5 @@
+{
+  "code": "MINT_UNSUPPORTED_CAPABILITY",
+  "message": "incompatible",
+  "rendered": "MINT_UNSUPPORTED_CAPABILITY at root:10:1: capability repo.branch_protection is incompatible with targets ['k8s.workload']; accepted kinds are ['repo.github']"
+}

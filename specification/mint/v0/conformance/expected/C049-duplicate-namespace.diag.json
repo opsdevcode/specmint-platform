@@ -1,0 +1,5 @@
+{
+  "code": "MINT_DUPLICATE_NAMESPACE",
+  "message": "namespace",
+  "rendered": "MINT_DUPLICATE_NAMESPACE at b.mint:2:1: namespace example.dup is declared more than once; keep one compilation unit per namespace"
+}

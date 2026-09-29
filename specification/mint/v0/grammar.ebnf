@@ -1,0 +1,44 @@
+(* Mint Language v0. The recursive-descent reference parser is the implementation. *)
+
+program     = classic | module ;
+classic     = { comment | ws } , "mint" , ws , edition , ws , automation , { comment | ws } ;
+module      = { comment | ws } , "mint" , ws , edition , { ws | comment | decl } ;
+edition     = "v0" | "v1alpha1" ;
+
+decl        = namespace_d | import_d | const_d | type_d | target_d | extension_d | automation ;
+
+namespace_d = "namespace" , ws , ident ;
+import_d    = "import" , ws , ident , [ ws , "as" , ws , ident ] ;
+const_d     = "const" , ws , ident , ws , value ;
+type_d      = "type" , ws , ident , ws , "{" , { ws | comment | ident , ws , ident } , "}" ;
+target_d    = "target" , ws , ident , ws , "{" , { ws | comment | target_field } , "}" ;
+extension_d = "extension" , ws , ident , ws , ident ;
+target_field = "kind" , ws , ident | "config" , ws , object ;
+
+automation  = "automation" , ws , ident , ws , "{" , { ws | comment | field } , "}" ;
+
+field       = owner_f | intent_f | use_f | sandbox_f | evidence_f
+            | apply_f | caps_f | require_f | forbid_f | status_f ;
+
+owner_f     = "owner" , ws , string ;
+intent_f    = "intent" , ws , string ;
+use_f       = "use" , ws , ident , ws , "v1alpha1" ;
+sandbox_f   = "sandbox" , ws , ident ;
+evidence_f  = "evidence" , ws , ident , { ws , "," , ws , ident } ;
+apply_f     = "apply" , ws , ident , { ws , "," , ws , ident } ;
+caps_f      = "capabilities" , ws , ident , ws , "v1alpha1" ,
+              { ws , "," , ws , ident , ws , "v1alpha1" } ;
+require_f   = "require" , ws , "authorization" ;
+forbid_f    = "forbid" , ws , "mutation" ;
+status_f    = "status" , ws , status_name ;
+
+status_name = "draft" | "active" | "paused" | "retired" ;
+value       = string | number | "true" | "false" | object | ident ;
+object      = "{" , { ws | ident , ws , value } , "}" ;
+
+ident       = letter | "_" , { letter | digit | "_" | "." | "-" } ;
+string      = '"' , { char | escape } , '"' ;
+number      = digit , { digit } ;
+escape      = "\\" , ( "\\" | '"' | "n" ) ;
+comment     = "//" , { character - newline } , newline ;
+ws          = { space | tab | cr | newline } ;

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsdevcode.io/schemas/mint-ir.v0.json",
+  "title": "MintIR",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "language", "unit"],
+  "properties": {
+    "apiVersion": { "const": "mint.opsdevcode.io/v0" },
+    "kind": { "const": "MintIR" },
+    "language": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edition", "sourceEdition"],
+      "properties": {
+        "edition": { "const": "v0" },
+        "sourceEdition": { "enum": ["v0", "v1alpha1"] }
+      }
+    },
+    "unit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "owner",
+        "statement",
+        "verb",
+        "placement",
+        "evidence",
+        "constraints",
+        "status"
+      ],
+      "properties": {
+        "kind": { "const": "automation" },
+        "id": {
+          "type": "string",
+          "pattern": "^as-[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$"
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+        },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "verb": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "version"],
+          "properties": {
+            "type": { "const": "local.sandbox.ensure_marker" },
+            "version": { "const": "v1alpha1" }
+          }
+        },
+        "placement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "id"],
+          "properties": {
+            "kind": { "const": "sandbox" },
+            "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,62}$" }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" }
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["authorization", "mutation"],
+          "properties": {
+            "authorization": { "const": "required" },
+            "mutation": { "const": "forbidden" }
+          }
+        },
+        "status": { "enum": ["draft", "active", "paused", "retired"] }
+      }
+    }
+  }
+}

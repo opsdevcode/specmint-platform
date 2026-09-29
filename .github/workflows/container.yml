@@ -1,0 +1,56 @@
+name: Container
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  ghcr:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Log in to GHCR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Build and push tagged image (no latest)
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          IMAGE="ghcr.io/opsdevcode/specmint"
+          VERSION="${TAG#v}"
+          docker build -t "${IMAGE}:${VERSION}" .
+          docker push "${IMAGE}:${VERSION}"
+          docker inspect --format='{{index .RepoDigests 0}}' "${IMAGE}:${VERSION}" || true
+      - name: SBOM (best effort)
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          IMAGE="ghcr.io/opsdevcode/specmint:${VERSION}"
+          if command -v syft >/dev/null 2>&1; then
+            syft "${IMAGE}" -o spdx-json > specmint.spdx.json
+          else
+            echo "syft not installed on runner; skip SBOM"
+          fi
+      - name: Sign (best effort)
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          IMAGE="ghcr.io/opsdevcode/specmint:${VERSION}"
+          if command -v cosign >/dev/null 2>&1; then
+            cosign sign --yes "${IMAGE}"
+          else
+            echo "cosign not installed on runner; skip signing"
+          fi

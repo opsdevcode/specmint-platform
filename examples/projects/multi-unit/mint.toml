@@ -1,0 +1,5 @@
+schema = "mint.project/v0"
+name = "multi-unit"
+edition = "v0"
+root = "main.mint"
+units = ["lib.mint", "main.mint"]

@@ -1,0 +1,5 @@
+{
+  "code": "MINT_DUPLICATE_ALIAS",
+  "message": "duplicate import alias",
+  "rendered": "MINT_DUPLICATE_ALIAS at main.mint:4:1: duplicate import alias lib; keep one alias per name"
+}

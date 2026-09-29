@@ -1,0 +1,7 @@
+{
+  "root": "main.mint",
+  "units": [
+    "main.mint",
+    "lib.mint"
+  ]
+}

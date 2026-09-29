@@ -1,0 +1,12 @@
+schema = "mint.project/v0"
+name = "extensions"
+edition = "v0"
+root = "main.mint"
+units = ["main.mint"]
+catalogs = ["catalogs/v0.json"]
+
+[[extensions]]
+path = "extensions/sample.json"
+
+[profiles.local]
+targets = ["fixture-alpha"]

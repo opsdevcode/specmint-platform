@@ -1,0 +1,16 @@
+{
+  "capabilities": [
+    {
+      "targetKinds": [
+        "sandbox"
+      ],
+      "type": "ext.sample.tag",
+      "version": "v1alpha1"
+    }
+  ],
+  "metadataNamespaces": [
+    "ext.sample"
+  ],
+  "namespace": "ext.sample",
+  "version": "v1alpha1"
+}

@@ -1,0 +1,5 @@
+{
+  "code": "MINT_INVALID_QUALIFIED_REF",
+  "message": "invalid qualified reference",
+  "rendered": "MINT_INVALID_QUALIFIED_REF at main.mint:4:1: invalid qualified reference lib.missing; import the namespace and use alias.name"
+}

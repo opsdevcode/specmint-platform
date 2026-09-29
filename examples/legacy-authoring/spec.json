@@ -1,0 +1,26 @@
+{
+  "apiVersion": "automations.opsdevcode.io/v1alpha1",
+  "kind": "AutomationSpecification",
+  "metadata": {
+    "id": "as-local-marker-1"
+  },
+  "spec": {
+    "owner": "platform@opsdevcode.com",
+    "intent": "Ensure a sandbox marker exists after an authorized plan",
+    "automation": {
+      "type": "local.sandbox.ensure_marker",
+      "version": "v1alpha1"
+    },
+    "placement": {
+      "sandbox": "fixture-alpha"
+    },
+    "required_evidence": [
+      "marker.present"
+    ],
+    "constraints": {
+      "require_authorization": true,
+      "allow_platform_mutation": false
+    },
+    "status": "draft"
+  }
+}

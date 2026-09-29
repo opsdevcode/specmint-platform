@@ -1,0 +1,28 @@
+(* Mint Language v1alpha1. Recursive-descent parser is the implementation. *)
+
+program     = { comment | ws } , "mint" , ws , "v1alpha1" , ws , automation , { comment | ws } ;
+
+automation  = "automation" , ws , ident , ws , "{" , { ws | comment | field } , "}" ;
+
+field       = owner_f | intent_f | use_f | sandbox_f | evidence_f
+            | require_f | forbid_f | status_f ;
+
+owner_f     = "owner" , ws , string ;
+intent_f    = "intent" , ws , string ;
+use_f       = "use" , ws , ident , ws , "v1alpha1" ;
+sandbox_f   = "sandbox" , ws , ident ;
+evidence_f  = "evidence" , ws , ident , { ws , "," , ws , ident } ;
+require_f   = "require" , ws , "authorization" ;
+forbid_f    = "forbid" , ws , "mutation" ;
+status_f    = "status" , ws , status_name ;
+
+status_name = "draft" | "active" | "paused" | "retired" ;
+
+ident       = letter | "_" , { letter | digit | "_" | "." | "-" } ;
+string      = '"' , { char | escape } , '"' ;
+escape      = "\\" , ( "\\" | '"' | "n" ) ;
+comment     = "//" , { character - newline } , newline ;
+ws          = { space | tab | newline } ;
+
+letter      = "A" | "B" | … | "Z" | "a" | "b" | … | "z" ;
+digit       = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;

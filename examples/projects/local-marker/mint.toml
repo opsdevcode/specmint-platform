@@ -1,0 +1,5 @@
+schema = "mint.project/v0"
+name = "local-marker"
+edition = "v0"
+root = "main.mint"
+units = ["main.mint"]

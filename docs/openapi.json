@@ -1,0 +1,381 @@
+{
+  "info": {
+    "title": "OpsDevCode SpecMint",
+    "version": "0.1.0a1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/platform/v0/approvals": {
+      "post": {
+        "operationId": "post_approval_api_platform_v0_approvals_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Approval Api Platform V0 Approvals Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Approval"
+      }
+    },
+    "/api/platform/v0/capabilities": {
+      "get": {
+        "operationId": "get_capabilities_api_platform_v0_capabilities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Capabilities Api Platform V0 Capabilities Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Capabilities"
+      },
+      "post": {
+        "operationId": "post_capabilities_api_platform_v0_capabilities_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Capabilities Api Platform V0 Capabilities Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Capabilities"
+      }
+    },
+    "/api/platform/v0/compile": {
+      "post": {
+        "operationId": "post_compile_api_platform_v0_compile_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Compile Api Platform V0 Compile Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Compile"
+      }
+    },
+    "/api/platform/v0/evidence": {
+      "post": {
+        "operationId": "post_evidence_api_platform_v0_evidence_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Evidence Api Platform V0 Evidence Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Evidence"
+      }
+    },
+    "/api/platform/v0/healthz": {
+      "get": {
+        "operationId": "platform_health_api_platform_v0_healthz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Platform Health Api Platform V0 Healthz Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Platform Health"
+      }
+    },
+    "/api/platform/v0/plans": {
+      "get": {
+        "operationId": "get_plans_api_platform_v0_plans_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Plans Api Platform V0 Plans Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Plans"
+      },
+      "post": {
+        "operationId": "post_plan_api_platform_v0_plans_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Plan Api Platform V0 Plans Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Plan"
+      }
+    },
+    "/api/platform/v0/readyz": {
+      "get": {
+        "operationId": "platform_ready_api_platform_v0_readyz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Platform Ready Api Platform V0 Readyz Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Platform Ready"
+      }
+    },
+    "/api/platform/v0/runs": {
+      "get": {
+        "operationId": "get_runs_api_platform_v0_runs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Runs Api Platform V0 Runs Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Runs"
+      },
+      "post": {
+        "operationId": "post_run_api_platform_v0_runs_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Run Api Platform V0 Runs Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Run"
+      }
+    },
+    "/api/platform/v0/sandbox": {
+      "post": {
+        "operationId": "post_sandbox_api_platform_v0_sandbox_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Sandbox Api Platform V0 Sandbox Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Sandbox"
+      }
+    },
+    "/api/platform/v0/snapshots": {
+      "post": {
+        "operationId": "post_snapshot_api_platform_v0_snapshots_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Snapshot Api Platform V0 Snapshots Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Snapshot"
+      }
+    },
+    "/api/platform/v0/verifications": {
+      "post": {
+        "operationId": "post_verify_api_platform_v0_verifications_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Verify Api Platform V0 Verifications Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Verify"
+      }
+    },
+    "/api/specifications/v1/compile": {
+      "post": {
+        "operationId": "post_compile_api_specifications_v1_compile_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Compile Api Specifications V1 Compile Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Compile"
+      }
+    },
+    "/api/specifications/v1/inspect": {
+      "post": {
+        "operationId": "post_inspect_api_specifications_v1_inspect_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Inspect Api Specifications V1 Inspect Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Inspect"
+      }
+    },
+    "/api/specifications/v1/validate": {
+      "post": {
+        "operationId": "post_validate_api_specifications_v1_validate_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Validate Api Specifications V1 Validate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Validate"
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "get_healthz_healthz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Healthz Healthz Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Healthz"
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "get_readyz_readyz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Readyz"
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "code": "MINT_AMBIGUOUS_SYMBOL",
+  "message": "ambiguous symbol",
+  "rendered": "MINT_AMBIGUOUS_SYMBOL at main.mint:5:1: ambiguous symbol Limit; qualify the reference"
+}

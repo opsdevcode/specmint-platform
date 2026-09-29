@@ -1,0 +1,5 @@
+{
+  "code": "MINT_DUPLICATE_DECLARATION",
+  "message": "duplicate declaration",
+  "rendered": "MINT_DUPLICATE_DECLARATION at root:4:1: duplicate declaration example.dup/const/label; keep one label in example.dup"
+}

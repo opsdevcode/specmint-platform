@@ -1,0 +1,21 @@
+name: GitHub Pages
+
+# Org administrators currently disable Pages site creation. Keep docs in
+# /docs. This workflow stays a no-op so CI remains green.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  skip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pages disabled at org
+        run: |
+          echo "GitHub Pages is disabled for the opsdevcode org."
+          echo "Platform docs remain in docs/."

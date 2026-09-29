@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.opsdevcode.io/specmint/delivery-specification.v1alpha1.json",
+  "title": "DeliverySpecification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": { "const": "specs.opsdevcode.io/v1alpha1" },
+    "kind": { "const": "DeliverySpecification" },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^ds-[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$"
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner",
+        "intent",
+        "target",
+        "required_capabilities",
+        "constraints",
+        "status"
+      ],
+      "properties": {
+        "owner": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" },
+        "intent": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["repository"],
+          "properties": {
+            "repository": { "type": "string", "pattern": "^https://.+" }
+          }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$"
+            }
+          }
+        },
+        "required_capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$"
+          }
+        },
+        "required_evidence": {
+          "type": "array",
+          "default": [],
+          "items": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" }
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["recorded_baseline_approved"],
+          "properties": {
+            "recorded_baseline_approved": { "type": "boolean" }
+          }
+        },
+        "exception_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allow_unexpired": { "type": "boolean", "default": false }
+          }
+        },
+        "convergence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "compare": { "const": "on_demand" },
+            "unknown_is_not_compliant": { "type": "boolean", "default": true }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "active", "paused", "retired"]
+        }
+      }
+    }
+  }
+}

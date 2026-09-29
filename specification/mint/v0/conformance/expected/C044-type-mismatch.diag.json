@@ -1,0 +1,5 @@
+{
+  "code": "MINT_TYPE_MISMATCH",
+  "message": "type mismatch",
+  "rendered": "MINT_TYPE_MISMATCH at main.mint:4:1: cross-module type mismatch: primary.owner wants string, got int"
+}

@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Python Quality and Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install --no-cache-dir -e ".[dev]"
+      - name: Ruff lint
+        run: ruff check src tests
+      - name: Ruff format
+        run: ruff format --check src tests
+      - name: mypy
+        run: mypy src
+      - name: Bandit
+        run: bandit -r src -c pyproject.toml
+      - name: pip-audit
+        run: pip-audit --skip-editable
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+      - name: Install pinned CUE
+        run: bash scripts/install-cue.sh
+      - name: Verify CUE pin
+        run: make cue-check PYTHON=python
+      - name: Install specmint (dev)
+        run: pip install --no-cache-dir -e ".[dev]"
+      - name: Unit tests
+        env:
+          PYTHONPATH: src
+          CUE_BIN: ${{ github.workspace }}/tools/cue
+        run: python -m pytest -q -m "not integration" --strict-markers
+
+  integration:
+    name: Platform PostgreSQL integration
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: specmint
+          POSTGRES_PASSWORD: specmint_ci_not_prod
+          POSTGRES_DB: specmint_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U specmint -d specmint_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+      - name: Install specmint (dev + durable)
+        run: pip install --no-cache-dir -e ".[dev,durable]"
+      - name: Apply platform migrations
+        env:
+          SPECMINT_DATABASE_URL: postgresql://specmint:specmint_ci_not_prod@127.0.0.1:5432/specmint_ci
+        run: python -m opsdevcode_specmint platform migrate
+      - name: Run integration suite
+        env:
+          PYTHONPATH: src
+          SPECMINT_DATABASE_URL: postgresql://specmint:specmint_ci_not_prod@127.0.0.1:5432/specmint_ci
+          SPECMINT_ENV: development
+          SPECMINT_FIXTURE_IDENTITY: "1"
+          SPECMINT_FIXTURE_IDENTITY_SECRET: ci-fixture-secret-not-for-production-v0
+          SPECMINT_ALLOW_SELF_APPROVE: "0"
+        run: python -m pytest -q -m integration --strict-markers

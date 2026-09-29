@@ -1,0 +1,5 @@
+{
+  "code": "MINT_UNKNOWN_EXTENSION",
+  "message": "unknown required extension",
+  "rendered": "MINT_UNKNOWN_EXTENSION at root:3:1: unknown required extension ext.missing; register ext.missing v1alpha1 in the compiler inputs"
+}

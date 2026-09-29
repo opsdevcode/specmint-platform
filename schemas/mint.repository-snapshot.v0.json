@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsdevcode.io/schemas/mint.repository-snapshot.v0.json",
+  "title": "MintRepositorySnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "identity",
+    "providerKind",
+    "settings",
+    "rules",
+    "security",
+    "files",
+    "completeness"
+  ],
+  "properties": {
+    "schema": { "const": "mint.repository-snapshot/v0" },
+    "kind": { "const": "MintRepositorySnapshot" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "name"],
+      "properties": {
+        "owner": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "providerKind": { "const": "repo.github" },
+    "settings": { "type": "object" },
+    "rules": { "type": "object" },
+    "security": { "type": "object" },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "digest"],
+        "properties": {
+          "path": { "type": "string" },
+          "digest": { "type": "string" },
+          "mode": { "type": "string" }
+        }
+      }
+    },
+    "completeness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["settings", "rules", "security", "files"],
+      "properties": {
+        "settings": {
+          "enum": ["complete", "unknown", "unavailable", "unsupported", "redacted"]
+        },
+        "rules": {
+          "enum": ["complete", "unknown", "unavailable", "unsupported", "redacted"]
+        },
+        "security": {
+          "enum": ["complete", "unknown", "unavailable", "unsupported", "redacted"]
+        },
+        "files": {
+          "enum": ["complete", "unknown", "unavailable", "unsupported", "redacted"]
+        }
+      }
+    },
+    "unknown": { "type": "array", "items": { "type": "string" } },
+    "unavailable": { "type": "array", "items": { "type": "string" } },
+    "unsupported": { "type": "array", "items": { "type": "string" } },
+    "redacted": { "type": "array", "items": { "type": "string" } },
+    "digest": { "type": "string" }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.opsdevcode.io/automation-specification.v1alpha1.json",
+  "title": "AutomationSpecification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": { "const": "automations.opsdevcode.io/v1alpha1" },
+    "kind": { "const": "AutomationSpecification" },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^as-[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$" }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "intent", "automation", "placement", "constraints", "status"],
+      "properties": {
+        "owner": { "type": "string" },
+        "intent": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "automation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "version"],
+          "properties": {
+            "type": { "const": "local.sandbox.ensure_marker" },
+            "version": { "const": "v1alpha1" }
+          }
+        },
+        "placement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sandbox"],
+          "properties": {
+            "sandbox": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,62}$" }
+          }
+        },
+        "required_evidence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allow_platform_mutation"],
+          "properties": {
+            "require_authorization": { "type": "boolean" },
+            "allow_platform_mutation": { "const": false }
+          }
+        },
+        "status": { "enum": ["draft", "active", "paused", "retired"] }
+      }
+    }
+  }
+}

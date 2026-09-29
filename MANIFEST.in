@@ -1,0 +1,7 @@
+include LICENSE README.md CHANGELOG.md SECURITY.md pyproject.toml
+recursive-include cue *
+recursive-include schemas *.json
+recursive-include specification *
+recursive-include src *.py
+prune tools
+global-exclude tools/cue

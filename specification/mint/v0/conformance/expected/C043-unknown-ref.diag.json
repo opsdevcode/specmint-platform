@@ -1,0 +1,5 @@
+{
+  "code": "MINT_UNKNOWN_SYMBOL",
+  "message": "unknown symbol missing-target",
+  "rendered": "MINT_UNKNOWN_SYMBOL at root:3:1: unknown symbol missing-target; import it or declare it in example.missing"
+}

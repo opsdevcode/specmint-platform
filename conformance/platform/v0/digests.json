@@ -1,0 +1,5 @@
+{
+  "algorithm": "sha256 of committed schema file bytes (not snapshot instance bytes)",
+  "schema": "mint.repository-snapshot.v0.json",
+  "schemaDigest": "sha256:5bbc939fd007142ecbe0de043384c54c1101545a3ca43b0b26ec89ca73db58e4"
+}

@@ -1,0 +1,5 @@
+{
+  "code": "MINT_UNKNOWN_IMPORT",
+  "message": "unknown import",
+  "rendered": "MINT_UNKNOWN_IMPORT at main.mint:3:1: unknown import example.missing; add that unit to the compiler inputs"
+}

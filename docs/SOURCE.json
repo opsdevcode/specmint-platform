@@ -1,0 +1,6 @@
+{
+  "source_repo": "opsdevcode/specmint",
+  "source_sha": "9ddc7c96a69737581d4674f50062be2b4195f91f",
+  "method": "forward-copy-bytes-only",
+  "public_repo": "opsdevcode/specmint-platform"
+}

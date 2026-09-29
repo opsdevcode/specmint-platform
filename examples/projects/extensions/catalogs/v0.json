@@ -1,0 +1,1 @@
+{"ids":["aws.account.audit@v1alpha1","aws.iam.constraint@v1alpha1","gcp.iam.constraint@v1alpha1","k8s.workload.pod_security@v1alpha1","local.dev.ensure_workspace@v1alpha1","local.sandbox.ensure_marker@v1alpha1","repo.branch_protection@v1alpha1","repo.managed_file@v1alpha1","repo.security@v1alpha1","repo.settings@v1alpha1"],"version":"v0"}

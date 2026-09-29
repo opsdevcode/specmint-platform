@@ -1,0 +1,9 @@
+schema = "mint.project/v0"
+name = "modules"
+edition = "v0"
+root = "main.mint"
+units = ["lib.mint", "main.mint"]
+catalogs = ["catalogs/v0.json"]
+
+[profiles.local]
+targets = ["primary"]

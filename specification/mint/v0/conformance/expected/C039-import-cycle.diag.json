@@ -1,0 +1,5 @@
+{
+  "code": "MINT_IMPORT_CYCLE",
+  "message": "import cycle",
+  "rendered": "MINT_IMPORT_CYCLE at b.mint:3:1: import cycle involving example.a; break the cycle"
+}

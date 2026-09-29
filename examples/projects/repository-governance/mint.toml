@@ -1,0 +1,9 @@
+schema = "mint.project/v0"
+name = "repository-governance"
+edition = "v0"
+root = "main.mint"
+units = ["main.mint"]
+catalogs = ["catalogs/v0.json"]
+
+[profiles.local]
+targets = ["primary"]
