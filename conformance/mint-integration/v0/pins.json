@@ -1,0 +1,8 @@
+{
+  "artifact": "sha256:cb9987205c42908787f631b792ab0ea7185d5855f6fa6f2f44a8f9fae63b8df7",
+  "owner": "opsdevcode/specmint-language",
+  "ownerRevision": "63a870becc2f1a7b312b713d00e1e0d2b1a42f4a",
+  "schemas": {
+    "mint.integration.v0.json": "sha256:acd43162ca651ddc8076f4d1b1f52c5d94ed4d68df9f4a5c3e1f7648be57045b"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "$id": "mint.integration/v0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {"type": "string"},
+        "identity": {"type": "string"}
+      },
+      "required": ["digest", "identity"],
+      "type": "object"
+    },
+    "capabilities": {"type": "array"},
+    "compatibility": {"type": "object"},
+    "configurationSchemas": {"type": "array"},
+    "deprecation": {"type": "object"},
+    "executionSupport": {"enum": ["none", "fake", "privileged"]},
+    "identity": {"type": "string"},
+    "implementation": {"type": "object"},
+    "name": {"type": "string"},
+    "namespace": {"type": "string"},
+    "permissions": {"type": "array"},
+    "phases": {"type": "array"},
+    "protocolVersions": {"type": "array"},
+    "provenance": {"type": "object"},
+    "schema": {"const": "mint.integration/v0"},
+    "targetKinds": {"type": "array"},
+    "version": {"type": "string"}
+  },
+  "required": [
+    "artifact",
+    "capabilities",
+    "compatibility",
+    "configurationSchemas",
+    "deprecation",
+    "executionSupport",
+    "identity",
+    "implementation",
+    "name",
+    "namespace",
+    "permissions",
+    "phases",
+    "protocolVersions",
+    "provenance",
+    "schema",
+    "targetKinds",
+    "version"
+  ],
+  "title": "Mint Integration Manifest",
+  "type": "object"
+}
