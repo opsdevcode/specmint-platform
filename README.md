@@ -56,7 +56,7 @@ OpenAPI: `GET /openapi.json`.
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
-Public preview **0.1.0a2** (tag `v0.1.0-alpha.2`).
-Image `ghcr.io/opsdevcode/specmint:0.1.0-alpha.2` (no `latest`).
+Public preview **0.1.0a3** (tag `v0.1.0-alpha.3`).
+Image `ghcr.io/opsdevcode/specmint:0.1.0-alpha.3` (no `latest`).
 Distribution `opsdevcode-specmint` is not published to the PyPI project
 `specmint`.
