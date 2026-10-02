@@ -4,9 +4,9 @@ Internal service SemVer. Distinct from specification contract versions.
 
 | Version family | Example | Meaning |
 | --- | --- | --- |
-| Service (PEP 440) | `0.1.0a2` in `pyproject.toml` | SpecMint process / distribution |
-| Git tag | `v0.1.0-alpha.2` | Canonical publish tag |
-| GHCR tag | `0.1.0-alpha.2` | `ghcr.io/opsdevcode/specmint:0.1.0-alpha.2` |
+| Service (PEP 440) | `0.1.0a3` in `pyproject.toml` | SpecMint process / distribution |
+| Git tag | `v0.1.0-alpha.3` | Canonical publish tag |
+| GHCR tag | `0.1.0-alpha.3` | `ghcr.io/opsdevcode/specmint:0.1.0-alpha.3` |
 | Spec contract | `specs.opsdevcode.io/v1alpha1` | `DeliverySpecification` |
 | Compiled intent | `intents.opsdevcode.io/v1alpha1` | `CompiledIntent` |
 | Automation contract | `automations.opsdevcode.io/v1alpha1` | `AutomationSpecification` / `AutomationIntent` |
@@ -25,11 +25,15 @@ This public preview is **not** production-ready. There is no `mint apply`.
 Do **not** tag `v1.0.0`. An accidental `v1.0.0-alpha.1` GitHub tag exists
 and is not current; do not recreate, force-push, or publish from it.
 
+`v0.1.0-alpha.2` is retained as an immutable, incomplete prerelease: its
+GitHub Release contains source archives only and its container smoke test
+failed before any GHCR push. Use `v0.1.0-alpha.3` or newer.
+
 ## Trigger
 
 Push the canonical git tag `vMAJOR.MINOR.PATCH` or
-`vMAJOR.MINOR.PATCH-alpha.N` (example: `v0.1.0-alpha.2` for PEP 440
-`0.1.0a2`). Mapping is strict: the tag must match `project.version`.
+`vMAJOR.MINOR.PATCH-alpha.N` (example: `v0.1.0-alpha.3` for PEP 440
+`0.1.0a3`). Mapping is strict: the tag must match `project.version`.
 
 The [Release](../.github/workflows/release.yml) workflow then:
 
@@ -68,7 +72,7 @@ not match the installed service version.
 The workflow authenticates with `GITHUB_TOKEN` and `packages: write`.
 Package **visibility** (public vs private) is an org-owner GitHub
 setting. If anonymous pull of
-`ghcr.io/opsdevcode/specmint:0.1.0-alpha.2` returns 401, an owner must
+`ghcr.io/opsdevcode/specmint:0.1.0-alpha.3` returns 401, an owner must
 make that package public. Do not weaken workflow permissions to work
 around a private package.
 
@@ -81,14 +85,14 @@ Before pushing the tag:
 
 1. `git fetch origin --tags` — confirm the canonical tag does not exist.
 2. `project.version` in `pyproject.toml` matches the intended PEP 440
-   value (currently `0.1.0a2`).
+   value (currently `0.1.0a3`).
 3. Required checks on that `origin/main` commit are green.
 4. A maintainer explicitly decides to cut the release.
 
 ```bash
 git fetch origin --tags
-make release-check    # prints v0.1.0-alpha.2; does not tag
+make release-check    # prints v0.1.0-alpha.3; does not tag
 git checkout "$(git rev-parse origin/main)"
-git tag "v0.1.0-alpha.2"
+git tag "v0.1.0-alpha.3"
 # push that tag only after the decision above
 ```
