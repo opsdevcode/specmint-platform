@@ -33,7 +33,7 @@ COPY cue /app/cue
 COPY migrations /app/migrations
 
 ENV SPECMINT_ENV=development \
-    SPECMINT_BOOTSTRAP=1 \
+    SPECMINT_BOOTSTRAP=0 \
     SPECMINT_ALLOW_MEMORY_STORE=1
 
 RUN pip install --no-cache-dir --upgrade pip==25.1.1 \

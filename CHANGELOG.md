@@ -3,6 +3,19 @@
 Service versions for SpecMint. Contract versions live in `docs/contract-v1.md`.
 This public preview is not production-ready. There is no `mint apply`.
 
+## 0.1.0-alpha.3 — 2026-10-02
+
+Release-recovery alpha for the public SpecMint Platform preview.
+
+- Starts the default fake/local container without enabling environment
+  bootstrap that requires an explicitly configured fixture identity secret.
+- Keeps protected platform bootstrap opt-in and preserves the fake-provider,
+  no-`mint apply`, no-live-mutation boundary.
+- Re-runs the tag-driven artifact and GHCR pipelines under the new immutable
+  tag `v0.1.0-alpha.3`.
+- Retains `v0.1.0-alpha.2` unchanged as an incomplete prerelease; its
+  GitHub Release contains source archives only and no GHCR image was pushed.
+
 ## 0.1.0-alpha.2 — 2026-10-02
 
 Integration Protocol v0 governed realization lifecycle.
