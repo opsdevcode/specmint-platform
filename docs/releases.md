@@ -32,7 +32,7 @@ Humans and local scripts do not calculate or push release tags.
 5. Merging that green release PR is the release approval. Release Please
    creates the canonical tag and GitHub prerelease.
 6. The release event builds and tests the Python artifacts and publishes the
-   immutable GHCR tag. The container workflow never publishes `latest`.
+   immutable GHCR tag. The container workflow never pushes `latest`.
 
 Release Please uses a one-hour GitHub App installation token scoped to only
 `opsdevcode/specmint-platform`, with only contents, issues, metadata, and pull
