@@ -1,0 +1,43 @@
+name: Release Train
+
+# Conventional Commits -> SemVer alpha release PR -> tag + GitHub prerelease.
+# The GitHub App token is repository-scoped and permission-downscoped so PR
+# checks run normally. Merging the generated release PR is the release gate.
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: release-train-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint repository-scoped release token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+        with:
+          app-id: "4504660"
+          private-key: ${{ secrets.REPAVE_GITHUB_APP_PRIVATE_KEY }}
+          owner: opsdevcode
+          repositories: specmint-platform
+          permission-contents: write
+          permission-issues: write
+          permission-metadata: read
+          permission-pull-requests: write
+
+      - name: Maintain SemVer release PR or create release
+        id: release
+        uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
