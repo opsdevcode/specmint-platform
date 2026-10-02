@@ -21,6 +21,9 @@ from opsdevcode_specmint.pins import (
 _RELEASE_TAG = re.compile(
     r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-alpha\.(0|[1-9]\d*)|a(0|[1-9]\d*))?$"
 )
+_PEP440_ALPHA = re.compile(r"^((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))a([1-9]\d*)$")
+_PEP440_FINAL = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
+_ALIAS_TAGS = frozenset({"latest", "vlatest", "stable", "vstable", "release"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +35,13 @@ class ReleaseTagResult:
 
 def parse_release_tag(tag: str) -> ReleaseTagResult:
     candidate = tag.strip()
+    if candidate.lower() in _ALIAS_TAGS:
+        return ReleaseTagResult(
+            False,
+            "",
+            "set the git tag to vMAJOR.MINOR.PATCH (example: v0.1.0); "
+            "prerelease and alias tags are rejected",
+        )
     match = _RELEASE_TAG.fullmatch(candidate)
     if match is None:
         return ReleaseTagResult(
@@ -54,6 +64,25 @@ def require_release_tag(tag: str) -> str:
     return result.version
 
 
+def git_tag_for_service_version(service_version: str) -> str:
+    """Map PEP 440 `0.1.0a2` to git tag `v0.1.0-alpha.2`."""
+    raw = service_version.strip()
+    alpha = _PEP440_ALPHA.fullmatch(raw)
+    if alpha is not None:
+        return f"v{alpha.group(1)}-alpha.{alpha.group(2)}"
+    if _PEP440_FINAL.fullmatch(raw) is not None:
+        return f"v{raw}"
+    raise ValueError(
+        f"unsupported service version {service_version!r}; expected PEP 440 0.x.x or 0.x.xaN"
+    )
+
+
+def ghcr_tag_for_service_version(service_version: str) -> str:
+    """Image tag is the git tag without the leading v. Never `latest`."""
+    tag = git_tag_for_service_version(service_version)
+    return tag[1:]
+
+
 def release_tag_matches_service(*, tag: str, service_version: str) -> ReleaseTagResult:
     parsed = parse_release_tag(tag)
     if not parsed.accepted:
@@ -68,25 +97,63 @@ def release_tag_matches_service(*, tag: str, service_version: str) -> ReleaseTag
     return parsed
 
 
+def require_canonical_release_tag(*, tag: str, service_version: str) -> ReleaseTagResult:
+    """Publish gate: PEP 440 0.1.0a2 may only be cut as v0.1.0-alpha.2."""
+    matched = release_tag_matches_service(tag=tag, service_version=service_version)
+    if not matched.accepted:
+        return matched
+    canonical = git_tag_for_service_version(service_version)
+    if tag.strip() != canonical:
+        return ReleaseTagResult(
+            False,
+            matched.version,
+            f"tag {tag} must use canonical form {canonical} (PEP 440 {service_version})",
+        )
+    return matched
+
+
+def refuse_1x_or_alias(tag: str) -> ReleaseTagResult:
+    """Workflow publish gate. Accidental v1.0.0-alpha.1 is not current."""
+    candidate = tag.strip()
+    lowered = candidate.lower()
+    if lowered in _ALIAS_TAGS:
+        return ReleaseTagResult(False, "", f"refuse alias tag {tag}; never publish latest/stable")
+    parsed = parse_release_tag(candidate)
+    if not parsed.accepted:
+        return parsed
+    if parsed.version.startswith("1."):
+        return ReleaseTagResult(
+            False,
+            parsed.version,
+            "refuse 1.x tags from this tree; accidental v1.0.0-alpha.1 is not current",
+        )
+    return parsed
+
+
 def first_release_tag(*, service_version: str) -> str:
-    """Return the first allowed service tag. Does not create a git tag."""
-    result = release_tag_matches_service(
-        tag=f"v{service_version}",
-        service_version=service_version,
-    )
+    """Return the canonical git tag for this 0.x service version. Does not create a git tag."""
+    tag = git_tag_for_service_version(service_version)
+    result = release_tag_matches_service(tag=tag, service_version=service_version)
     if not result.accepted:
         raise ValueError(result.message)
+    blocked = refuse_1x_or_alias(tag)
+    if not blocked.accepted:
+        raise ValueError(blocked.message)
     if not result.version.startswith("0."):
         raise ValueError("first service tag must stay on 0.x; do not tag v1.0.0 from this tree")
-    return f"v{result.version}"
+    return tag
 
 
 def render_release_notes(service_version: str) -> str:
+    image_tag = ghcr_tag_for_service_version(service_version)
     return (
         f"SpecMint {service_version}\n"
         "\n"
-        "Public SpecMint core. SpecMint validates and compiles\n"
-        "DeliverySpecification and AutomationSpecification documents.\n"
+        "Headline: Integration Protocol v0 governed realization lifecycle.\n"
+        "\n"
+        "Mint (opsdevcode/specmint-language) is the language and entry product.\n"
+        "SpecMint is the governed runtime. Public SpecMint core validates and\n"
+        "compiles DeliverySpecification and AutomationSpecification documents.\n"
         "Default execution uses fake providers. mint apply is absent.\n"
         "The hosted service stays private. This alpha is not production-ready.\n"
         "\n"
@@ -107,11 +174,12 @@ def render_release_notes(service_version: str) -> str:
         "\n"
         "Artifacts\n"
         "- GitHub source archive\n"
-        "- opsdevcode-specmint sdist attached to the GitHub Release\n"
+        "- opsdevcode-specmint sdist and wheel attached to the GitHub Release\n"
         "\n"
         "Scope\n"
         "- public core extract; hosted service private\n"
         "- no policy-engine evaluation\n"
         "- fake providers in the default distribution\n"
-        "- GHCR tag 0.1.0-alpha.1 (no latest) from the container workflow\n"
+        f"- GHCR tag {image_tag} (no latest) from the container workflow\n"
+        "- not published to the PyPI project specmint\n"
     )

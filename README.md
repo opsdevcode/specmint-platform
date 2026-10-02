@@ -4,11 +4,14 @@ Public **SpecMint core**: HTTP API, OpenAPI, compile, snapshots, plan,
 lifecycle, approvals, execution, evidence, stores, identity, fake providers,
 and docker compose self-host.
 
-Mint (the language) lives in
-[`opsdevcode/specmint-language`](https://github.com/opsdevcode/specmint-language).
-This repository is the independently usable SpecMint platform. The hosted
-OpsDevCode service stays private. Product SKUs remain Repave, Overpass, Toll,
-and Dispatch. Relay is delivery. This is **not** production-ready.
+**Mint** is the language and entry product
+([`opsdevcode/specmint-language`](https://github.com/opsdevcode/specmint-language)).
+**SpecMint** is the governed runtime that compiles Mint, plans a change,
+records approval, executes through fake/local providers, verifies, and
+stores evidence. This repository is the independently usable SpecMint
+platform. The hosted OpsDevCode service stays private. Product SKUs
+remain Repave, Overpass, Toll, and Dispatch. Relay is delivery. This is
+**not** production-ready.
 
 There is no `mint apply`. Default distribution uses local/fake providers,
 fixture identity only when explicitly configured, and cannot perform live
@@ -53,4 +56,7 @@ OpenAPI: `GET /openapi.json`.
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
-Alpha **0.1.0a1** (tag `v0.1.0-alpha.1`).
+Public preview **0.1.0a2** (tag `v0.1.0-alpha.2`).
+Image `ghcr.io/opsdevcode/specmint:0.1.0-alpha.2` (no `latest`).
+Distribution `opsdevcode-specmint` is not published to the PyPI project
+`specmint`.
