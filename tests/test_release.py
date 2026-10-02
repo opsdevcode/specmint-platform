@@ -84,20 +84,14 @@ def test_tag_must_match_service_version() -> None:
     current = service_version()
     matched = release_tag_matches_service(tag=f"v{current}", service_version=current)
     assert matched.accepted is True
-    hyphenated = release_tag_matches_service(
-        tag="v0.1.0-alpha.3", service_version="0.1.0a3"
-    )
+    hyphenated = release_tag_matches_service(tag="v0.1.0-alpha.3", service_version="0.1.0a3")
     assert hyphenated.accepted is True
     mismatched = release_tag_matches_service(tag="v9.9.9", service_version=current)
     assert mismatched.accepted is False
     assert "pyproject.toml" in mismatched.message
-    canonical = require_canonical_release_tag(
-        tag="v0.1.0-alpha.3", service_version="0.1.0a3"
-    )
+    canonical = require_canonical_release_tag(tag="v0.1.0-alpha.3", service_version="0.1.0a3")
     assert canonical.accepted is True
-    noncanonical = require_canonical_release_tag(
-        tag="v0.1.0a3", service_version="0.1.0a3"
-    )
+    noncanonical = require_canonical_release_tag(tag="v0.1.0a3", service_version="0.1.0a3")
     assert noncanonical.accepted is False
 
 
@@ -132,20 +126,14 @@ def test_release_notes_name_contracts_not_caller_cue() -> None:
 
 def test_first_release_tag_stays_on_0x() -> None:
     current = service_version()
-    assert first_release_tag(service_version=current) == git_tag_for_service_version(
-        current
-    )
+    assert first_release_tag(service_version=current) == git_tag_for_service_version(current)
     with pytest.raises(ValueError, match="0.x|1.x"):
         first_release_tag(service_version="1.0.0")
 
 
 def test_release_train_and_artifact_workflow() -> None:
-    publish = (REPO_ROOT / ".github" / "workflows" / "release.yml").read_text(
-        encoding="utf-8"
-    )
-    train = (REPO_ROOT / ".github" / "workflows" / "release-train.yml").read_text(
-        encoding="utf-8"
-    )
+    publish = (REPO_ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+    train = (REPO_ROOT / ".github" / "workflows" / "release-train.yml").read_text(encoding="utf-8")
     config = (REPO_ROOT / "release-please-config.json").read_text(encoding="utf-8")
     manifest = (REPO_ROOT / ".release-please-manifest.json").read_text(encoding="utf-8")
     assert "branches:" in train and "- main" in train
@@ -165,10 +153,7 @@ def test_release_train_and_artifact_workflow() -> None:
     assert "pypa/gh-action-pypi-publish" not in publish
     assert "PYPI_TOKEN" not in publish
     assert "anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c" in publish
-    assert (
-        "actions/attest-build-provenance@db473fddc028af60658334401dc6fa3ffd8669fd"
-        in publish
-    )
+    assert "actions/attest-build-provenance@db473fddc028af60658334401dc6fa3ffd8669fd" in publish
     assert "sha256sum" in publish
     assert "python -m venv" in publish
     _assert_third_party_actions_use_commit_shas(train)
@@ -176,9 +161,7 @@ def test_release_train_and_artifact_workflow() -> None:
 
 
 def test_container_workflow_publishes_immutable_ghcr_tag() -> None:
-    workflow = (REPO_ROOT / ".github" / "workflows" / "container.yml").read_text(
-        encoding="utf-8"
-    )
+    workflow = (REPO_ROOT / ".github" / "workflows" / "container.yml").read_text(encoding="utf-8")
     dockerfile = (REPO_ROOT / "Dockerfile").read_text(encoding="utf-8")
     assert "release:" in workflow and "- published" in workflow
     assert "tags:" not in workflow
@@ -207,9 +190,6 @@ def test_docs_forbid_pypi_specmint_and_latest() -> None:
     assert "mint apply" in changelog.lower()
     assert "not production-ready" in changelog.lower()
     assert "PyPI project `specmint`" in releases
-    assert (
-        "never pushes `latest`" in releases.lower()
-        or "Never pushes `latest`" in releases
-    )
+    assert "never pushes `latest`" in releases.lower() or "Never pushes `latest`" in releases
     assert "not published to" in releases
     assert "owner" in releases.lower()
