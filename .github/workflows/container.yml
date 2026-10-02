@@ -1,7 +1,7 @@
 name: Publish SpecMint Container
 
 # A Release Please prerelease is the only container publication trigger.
-# Publish only ghcr.io/opsdevcode/specmint:<semver>; never latest or stable.
+# Publish only ghcr.io/opsdevcode/specmint:<semver>; never push latest or stable.
 
 on:
   release:
@@ -133,4 +133,3 @@ jobs:
           subject-name: ghcr.io/opsdevcode/specmint
           subject-digest: ${{ steps.digest.outputs.digest }}
           push-to-registry: true
-
