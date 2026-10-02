@@ -4,12 +4,18 @@ Use the public SpecMint core to turn Mint intent into a plan, refuse an
 unapproved run, approve it as another fixture identity, execute with a fake
 provider, retry safely, and inspect simulated verification and evidence.
 
+Mint (`opsdevcode/specmint-language`) is the language and entry product.
+SpecMint is the governed runtime in this repository. Keep this environment
+separate from a Mint-language-only installation; both packages currently
+provide the `mint` command.
+
 You need Git and Python **3.12** on macOS or Linux. You do not need Repave,
 another OpsDevCode product, a GitHub account, cloud credentials, or Docker
 for this first walkthrough. The commands below use the source checkout;
 they do not depend on PyPI, GitHub Pages, or public container availability.
-Use this guide from the same revision as the scripts. The original
-`v0.1.0-alpha.1` tag contains only the earlier snapshot smoke demo.
+Use this guide from the same revision as the scripts (`0.1.0a2` /
+`v0.1.0-alpha.2`). The original `v0.1.0-alpha.1` tag contains only the
+earlier snapshot smoke demo.
 
 ## 1. Install in an isolated environment
 
@@ -25,9 +31,6 @@ python -m pip install -e ".[dev,durable]"
 The demo uses the native Mint compiler; CUE is not required for this flow.
 The broader specification API and contributor test suite also need the
 pinned CUE binary: run `make cue-install` for those paths.
-
-Keep this environment separate from a Mint-language-only installation;
-both packages currently provide the `mint` command.
 
 ## 2. Start a local API
 
