@@ -1,6 +1,6 @@
 [project]
 name = "opsdevcode-specmint"
-version = "0.1.0a3"
+version = "0.1.0-alpha.2"
 description = "SpecMint core: HTTP API, compile, snapshots, plan, lifecycle, fake providers."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -88,15 +88,3 @@ ignore_missing_imports = true
 exclude_dirs = ["tests"]
 skips = ["B603", "B404"]
 
-[tool.semantic_release]
-version_toml = ["pyproject.toml:project.version"]
-tag_format = "v{version}"
-commit_message = "chore(release): {version}"
-upload_to_vcs_release = false
-upload_to_pypi = false
-major_on_zero = false
-
-[tool.semantic_release.branches.main]
-match = "main"
-prerelease = true
-prerelease_token = "alpha"
