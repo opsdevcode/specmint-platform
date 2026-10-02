@@ -32,7 +32,7 @@ Humans and local scripts do not calculate or push release tags.
 5. Merging that green release PR is the release approval. Release Please
    creates the canonical tag and GitHub prerelease.
 6. The release event builds and tests the Python artifacts and publishes the
-   immutable GHCR tag. The container workflow never pushes `latest`.
+   immutable GHCR tag. The container workflow never publishes `latest`.
 
 Release Please uses a one-hour GitHub App installation token scoped to only
 `opsdevcode/specmint-platform`, with only contents, issues, metadata, and pull
@@ -51,9 +51,8 @@ required checks; no PAT is used.
 
 ## One-time credential setup
 
-The organization secret `REPAVE_GITHUB_APP_PRIVATE_KEY` must be available to
-this repository. The existing `repave-opsdevcode` App installation already
-covers the organization; the workflow downscopes each token to this repository
-and the explicit permissions above. Do not add a PAT or copy the private key
-into source.
-
+Repository owners must make the organization secret
+`REPAVE_GITHUB_APP_PRIVATE_KEY` available to this repository. The existing
+`repave-opsdevcode` App installation already covers the organization; the
+workflow downscopes each token to this repository and the explicit permissions
+above. Do not add a PAT or copy the private key into source.
