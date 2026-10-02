@@ -66,17 +66,17 @@ def test_accepts_alpha_tag() -> None:
     parsed = parse_release_tag("v0.1.0-alpha.1")
     assert parsed.accepted is True
     assert parsed.version == "0.1.0a1"
-    current = parse_release_tag("v0.1.0-alpha.2")
+    current = parse_release_tag("v0.1.0-alpha.3")
     assert current.accepted is True
-    assert current.version == "0.1.0a2"
-    pep440_form = parse_release_tag("v0.1.0a2")
+    assert current.version == "0.1.0a3"
+    pep440_form = parse_release_tag("v0.1.0a3")
     assert pep440_form.accepted is True
-    assert pep440_form.version == "0.1.0a2"
+    assert pep440_form.version == "0.1.0a3"
 
 
 def test_maps_pep440_alpha_to_canonical_git_and_ghcr_tags() -> None:
-    assert git_tag_for_service_version("0.1.0a2") == "v0.1.0-alpha.2"
-    assert ghcr_tag_for_service_version("0.1.0a2") == "0.1.0-alpha.2"
+    assert git_tag_for_service_version("0.1.0a3") == "v0.1.0-alpha.3"
+    assert ghcr_tag_for_service_version("0.1.0a3") == "0.1.0-alpha.3"
     assert git_tag_for_service_version("0.1.0") == "v0.1.0"
 
 
@@ -84,27 +84,27 @@ def test_tag_must_match_service_version() -> None:
     current = service_version()
     matched = release_tag_matches_service(tag=f"v{current}", service_version=current)
     assert matched.accepted is True
-    hyphenated = release_tag_matches_service(tag="v0.1.0-alpha.2", service_version="0.1.0a2")
+    hyphenated = release_tag_matches_service(tag="v0.1.0-alpha.3", service_version="0.1.0a3")
     assert hyphenated.accepted is True
     mismatched = release_tag_matches_service(tag="v9.9.9", service_version=current)
     assert mismatched.accepted is False
     assert "pyproject.toml" in mismatched.message
-    canonical = require_canonical_release_tag(tag="v0.1.0-alpha.2", service_version="0.1.0a2")
+    canonical = require_canonical_release_tag(tag="v0.1.0-alpha.3", service_version="0.1.0a3")
     assert canonical.accepted is True
-    noncanonical = require_canonical_release_tag(tag="v0.1.0a2", service_version="0.1.0a2")
+    noncanonical = require_canonical_release_tag(tag="v0.1.0a3", service_version="0.1.0a3")
     assert noncanonical.accepted is False
 
 
 def test_refuse_1x_latest_stable() -> None:
-    assert refuse_1x_or_alias("v0.1.0-alpha.2").accepted is True
+    assert refuse_1x_or_alias("v0.1.0-alpha.3").accepted is True
     for tag in ("latest", "stable", "v1.0.0", "v1.0.0-alpha.1"):
         result = refuse_1x_or_alias(tag)
         assert result.accepted is False
 
 
 def test_release_notes_name_contracts_not_caller_cue() -> None:
-    notes = render_release_notes("0.1.0a2")
-    assert "SpecMint 0.1.0a2" in notes
+    notes = render_release_notes("0.1.0a3")
+    assert "SpecMint 0.1.0a3" in notes
     assert "Integration Protocol v0" in notes
     assert "opsdevcode/specmint-language" in notes
     assert "governed runtime" in notes
@@ -118,12 +118,12 @@ def test_release_notes_name_contracts_not_caller_cue() -> None:
     assert "application/cue" not in notes
     assert "mint apply is absent" in notes
     assert "not production-ready" in notes
-    assert "GHCR tag 0.1.0-alpha.2 (no latest)" in notes
+    assert "GHCR tag 0.1.0-alpha.3 (no latest)" in notes
     assert "not published to the PyPI project specmint" in notes
 
 
 def test_first_release_tag_stays_on_0x() -> None:
-    assert first_release_tag(service_version=service_version()) == "v0.1.0-alpha.2"
+    assert first_release_tag(service_version=service_version()) == "v0.1.0-alpha.3"
     with pytest.raises(ValueError, match="0.x|1.x"):
         first_release_tag(service_version="1.0.0")
 
@@ -155,6 +155,7 @@ def test_release_workflow_is_tag_driven_with_supply_chain_gates() -> None:
 
 def test_container_workflow_publishes_immutable_ghcr_tag() -> None:
     workflow = (REPO_ROOT / ".github" / "workflows" / "container.yml").read_text(encoding="utf-8")
+    dockerfile = (REPO_ROOT / "Dockerfile").read_text(encoding="utf-8")
     assert "tags:" in workflow
     assert "ghcr.io/opsdevcode/specmint" in workflow
     assert "steps.meta.outputs.version" in workflow
@@ -168,6 +169,8 @@ def test_container_workflow_publishes_immutable_ghcr_tag() -> None:
     assert "owner-only" in workflow
     assert "PYPI_TOKEN" not in workflow
     assert "neither trivy nor grype" in workflow
+    assert "SPECMINT_BOOTSTRAP=0" in dockerfile
+    assert "SPECMINT_BOOTSTRAP=1" not in dockerfile
     _assert_third_party_actions_use_commit_shas(workflow)
 
 
