@@ -13,8 +13,8 @@ You need Git and Python **3.12** on macOS or Linux. You do not need Repave,
 another OpsDevCode product, a GitHub account, cloud credentials, or Docker
 for this first walkthrough. The commands below use the source checkout;
 they do not depend on PyPI, GitHub Pages, or public container availability.
-Use this guide from the same revision as the scripts (`0.1.0a2` /
-`v0.1.0-alpha.2`). The original `v0.1.0-alpha.1` tag contains only the
+Use this guide from the same revision as the scripts (`0.1.0a3` /
+`v0.1.0-alpha.3`). The original `v0.1.0-alpha.1` tag contains only the
 earlier snapshot smoke demo.
 
 ## 1. Install in an isolated environment
