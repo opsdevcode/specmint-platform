@@ -1,136 +1,80 @@
-name: Release
+name: Publish SpecMint Release
 
-# Tag-driven GitHub prerelease for opsdevcode-specmint.
-# Do not publish to the language package index named specmint.
-# Accidental GitHub tag v1.0.0-alpha.1 is not current; do not rebuild it.
+# Release Please owns versioning, tags, changelog, and the GitHub prerelease.
+# This workflow builds and attaches the exact Python artifacts for that release.
+# SpecMint Platform is never published to the PyPI project named specmint.
 
 on:
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch:
+  release:
+    types:
+      - published
 
-permissions:
-  contents: write
-  id-token: write
-  attestations: write
+permissions: {}
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: publish-${{ github.event.release.tag_name }}
   cancel-in-progress: false
 
 jobs:
-  release:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+  artifacts:
+    if: github.event.release.prerelease == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout@v7
         with:
+          ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # actions/setup-python@v7
         with:
           python-version: "3.12"
 
-      - name: Validate tag, refuse aliases and duplicate GitHub Releases
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: rel
+        name: Validate Release Please tag and version
         run: |
           set -euo pipefail
-          git fetch --tags origin
-
-          if [[ "${GITHUB_REF}" != refs/tags/v* ]]; then
-            echo "Release only from a version tag (example: v0.1.0-alpha.2)."
+          TAG="${{ github.event.release.tag_name }}"
+          if [[ ! "${TAG}" =~ ^v0\.[0-9]+\.[0-9]+-alpha\.[0-9]+$ ]]; then
+            echo "refuse non-alpha or 1.x release tag ${TAG}"
             exit 1
           fi
-
-          TAG="${GITHUB_REF_NAME}"
-          LOWER="$(printf '%s' "${TAG}" | tr '[:upper:]' '[:lower:]')"
-          STRIPPED="${TAG#v}"
-
-          if [[ "${LOWER}" == "latest" || "${LOWER}" == "vlatest" \
-             || "${LOWER}" == "stable" || "${LOWER}" == "vstable" \
-             || "${LOWER}" == "release" ]]; then
-            echo "refuse alias tag ${TAG}; never publish latest/stable."
+          SEMVER="${TAG#v}"
+          PYPROJECT_VERSION="$(python -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          if [[ "${PYPROJECT_VERSION}" != "${SEMVER}" ]]; then
+            echo "release tag ${TAG} must match pyproject.toml ${PYPROJECT_VERSION}"
             exit 1
           fi
-          if [[ "${STRIPPED}" == 1.* ]]; then
-            echo "refuse 1.x tag ${TAG}; accidental v1.0.0-alpha.1 is not current."
-            exit 1
-          fi
+          echo "pep440=${SEMVER/-alpha./a}" >>"${GITHUB_OUTPUT}"
+          echo "tag=${TAG}" >>"${GITHUB_OUTPUT}"
 
-          PY_VERSION="$(python -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
-          if [[ "${PY_VERSION}" == 1.* ]]; then
-            echo "refuse pyproject version ${PY_VERSION}; stay on 0.x."
-            exit 1
-          fi
+      - name: Quality
+        env:
+          PYTHONPATH: src
+        run: |
+          pip install --no-cache-dir -e ".[dev]"
+          ruff check src tests
+          ruff format --check src tests
+          mypy src
+          bandit -r src -c pyproject.toml
+          python -m pytest -q --strict-markers
 
-          pep440_from_git_tag() {
-            local t="${1#v}"
-            if [[ "${t}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-alpha\.([0-9]+)$ ]]; then
-              printf '%sa%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
-            elif [[ "${t}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)a([0-9]+)$ ]]; then
-              printf '%s\n' "${t}"
-            elif [[ "${t}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-              printf '%s\n' "${t}"
-            else
-              return 1
-            fi
-          }
-
-          git_tag_from_pep440() {
-            local v="$1"
-            if [[ "${v}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)a([0-9]+)$ ]]; then
-              printf 'v%s-alpha.%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
-            elif [[ "${v}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-              printf 'v%s\n' "${v}"
-            else
-              return 1
-            fi
-          }
-
-          PEP440="$(pep440_from_git_tag "${TAG}")" || {
-            echo "tag ${TAG} is not a supported vMAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH-alpha.N tag."
-            exit 1
-          }
-          CANONICAL="$(git_tag_from_pep440 "${PY_VERSION}")"
-          if [[ "${PEP440}" != "${PY_VERSION}" || "${TAG}" != "${CANONICAL}" ]]; then
-            echo "tag ${TAG} (PEP 440 ${PEP440}) must match pyproject ${PY_VERSION} as ${CANONICAL}."
-            exit 1
-          fi
-
-          equivalents=("${CANONICAL}")
-          if [[ "${PY_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)a([0-9]+)$ ]]; then
-            equivalents+=("v${BASH_REMATCH[1]}a${BASH_REMATCH[2]}")
-          fi
-          for existing in "${equivalents[@]}"; do
-            if gh release view "${existing}" >/dev/null 2>&1; then
-              echo "GitHub Release ${existing} already exists; fail closed (do not rebuild or overwrite)."
-              exit 1
-            fi
-          done
-
-          echo "Publishing canonical tag ${TAG} (PEP 440 ${PY_VERSION})."
-
-      - name: Build sdist and wheel once
+      - name: Build Python dist once
         run: |
           set -euo pipefail
           python -m pip install --no-cache-dir "build==1.2.2"
           python -m build --sdist --wheel --outdir dist
-          mapfile -t sdists < <(find dist -maxdepth 1 -name '*.tar.gz' -print)
-          mapfile -t wheels < <(find dist -maxdepth 1 -name '*.whl' -print)
-          if [[ "${#sdists[@]}" -ne 1 || "${#wheels[@]}" -ne 1 ]]; then
-            echo "expected exactly one sdist and one wheel in dist/"
-            ls -la dist
-            exit 1
-          fi
+          test "$(find dist -maxdepth 1 -name '*.tar.gz' | wc -l | tr -d ' ')" = 1
+          test "$(find dist -maxdepth 1 -name '*.whl' | wc -l | tr -d ' ')" = 1
 
       - name: Test exact artifacts in isolated Python 3.12 venvs
+        env:
+          PEP440: ${{ steps.rel.outputs.pep440 }}
         run: |
           set -euo pipefail
-          PY_VERSION="$(python -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
-          SDIST="$(find dist -maxdepth 1 -name '*.tar.gz' -print)"
-          WHEEL="$(find dist -maxdepth 1 -name '*.whl' -print)"
           smoke() {
             local artifact="$1"
             local root
@@ -138,21 +82,18 @@ jobs:
             python -m venv "${root}/venv"
             "${root}/venv/bin/python" -m pip install --no-cache-dir --upgrade pip
             "${root}/venv/bin/python" -m pip install --no-cache-dir "${artifact}"
-            "${root}/venv/bin/python" -c "from opsdevcode_specmint import __version__; assert __version__ == '${PY_VERSION}', __version__"
-            "${root}/venv/bin/python" -c "from opsdevcode_specmint.mint.cli import _build_parser; choices = dict(_build_parser()._subparsers._group_actions[0].choices); assert 'apply' not in choices"
+            "${root}/venv/bin/python" -c "from opsdevcode_specmint import __version__; assert __version__ == '${PEP440}', __version__"
+            "${root}/venv/bin/python" -c "from opsdevcode_specmint.mint.cli import _build_parser; assert 'apply' not in _build_parser()._subparsers._group_actions[0].choices"
             rm -rf "${root}"
           }
-          smoke "${SDIST}"
-          smoke "${WHEEL}"
+          smoke "$(find dist -maxdepth 1 -name '*.tar.gz')"
+          smoke "$(find dist -maxdepth 1 -name '*.whl')"
 
       - name: SHA-256 checksums
         run: |
-          set -euo pipefail
-          (
-            cd dist
-            sha256sum ./*.tar.gz ./*.whl > SHA256SUMS
-            cat SHA256SUMS
-          )
+          cd dist
+          sha256sum ./*.tar.gz ./*.whl > SHA256SUMS
+          cat SHA256SUMS
 
       - name: SBOM
         uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
@@ -171,18 +112,22 @@ jobs:
             dist/*.tar.gz
             dist/*.whl
 
-      - name: Create GitHub prerelease with tested artifacts
+      - name: Attach immutable assets to existing prerelease
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.rel.outputs.tag }}
         run: |
           set -euo pipefail
-          TAG="${GITHUB_REF_NAME}"
-          if gh release view "${TAG}" >/dev/null 2>&1; then
-            echo "GitHub Release ${TAG} already exists; fail closed (do not rebuild or overwrite)."
-            exit 1
-          fi
-          gh release create "${TAG}" dist/* \
-            --prerelease \
-            --title "SpecMint ${TAG#v}" \
-            --notes "SpecMint platform ${TAG}. Integration Protocol v0 governed realization lifecycle. Mint (opsdevcode/specmint-language) is the language and entry product; SpecMint is the governed runtime. Fake providers by default. mint apply is not included. Not production-ready. Hosted service stays private. Image: ghcr.io/opsdevcode/specmint:${TAG#v} (no latest). Not published to the PyPI project specmint." \
-            --target "${GITHUB_SHA}"
+          test "$(gh release view "${TAG}" --json isPrerelease --jq .isPrerelease)" = true
+          for asset in dist/*; do
+            name="$(basename "${asset}")"
+            id="$(gh api "/repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq ".assets[] | select(.name == \"${name}\") | .id")"
+            if [[ -n "${id}" ]]; then
+              gh api -H "Accept: application/octet-stream" "/repos/${GITHUB_REPOSITORY}/releases/assets/${id}" >"/tmp/${name}"
+              cmp "${asset}" "/tmp/${name}" || { echo "existing ${name} differs"; exit 1; }
+              continue
+            fi
+            gh release upload "${TAG}" "${asset}"
+          done
+

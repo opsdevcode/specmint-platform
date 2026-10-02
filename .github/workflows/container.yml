@@ -1,99 +1,65 @@
-name: Container
+name: Publish SpecMint Container
 
-# Tag-driven GHCR publish for ghcr.io/opsdevcode/specmint.
-# Image tag is ${TAG#v} so v0.1.0-alpha.2 → 0.1.0-alpha.2.
-# Never push latest. Never push stable.
-#
-# GHCR package visibility is an owner-only GitHub setting. If anonymous
-# pull returns 401, an org owner must make ghcr.io/opsdevcode/specmint
-# public. This workflow still publishes the immutable version tag with
-# packages: write. Do not weaken permissions to work around privacy.
+# A Release Please prerelease is the only container publication trigger.
+# Publish only ghcr.io/opsdevcode/specmint:<semver>; never push latest or stable.
 
 on:
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch:
+  release:
+    types:
+      - published
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-  attestations: write
+permissions: {}
 
 concurrency:
-  group: container-${{ github.ref }}
+  group: container-${{ github.event.release.tag_name }}
   cancel-in-progress: false
 
 jobs:
   ghcr:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    if: github.event.release.prerelease == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
     env:
       IMAGE: ghcr.io/opsdevcode/specmint
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Resolve immutable image tag
         id: meta
         run: |
           set -euo pipefail
-          if [[ "${GITHUB_REF}" != refs/tags/v* ]]; then
-            echo "Container publish only from a version tag (example: v0.1.0-alpha.2)."
+          TAG="${{ github.event.release.tag_name }}"
+          if [[ ! "${TAG}" =~ ^v0\.[0-9]+\.[0-9]+-alpha\.[0-9]+$ ]]; then
+            echo "refuse non-alpha, latest, stable, or 1.x tag ${TAG}"
             exit 1
           fi
-          TAG="${GITHUB_REF_NAME}"
-          LOWER="$(printf '%s' "${TAG}" | tr '[:upper:]' '[:lower:]')"
           VERSION="${TAG#v}"
-          if [[ "${LOWER}" == "latest" || "${LOWER}" == "vlatest" \
-             || "${LOWER}" == "stable" || "${LOWER}" == "vstable" \
-             || "${VERSION}" == "latest" || "${VERSION}" == "stable" ]]; then
-            echo "refuse latest/stable image tags."
+          PYPROJECT_VERSION="$(python3 -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          if [[ "${PYPROJECT_VERSION}" != "${VERSION}" ]]; then
+            echo "release tag ${TAG} must match pyproject.toml ${PYPROJECT_VERSION}"
             exit 1
           fi
-          if [[ "${VERSION}" == 1.* ]]; then
-            echo "refuse 1.x tag ${TAG}; accidental v1.0.0-alpha.1 is not current."
-            exit 1
-          fi
-          PY_VERSION="$(python3 -c 'import tomllib, pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
-          pep440_from_git_tag() {
-            local t="${1#v}"
-            if [[ "${t}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-alpha\.([0-9]+)$ ]]; then
-              printf '%sa%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
-            elif [[ "${t}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)a([0-9]+)$ ]]; then
-              printf '%s\n' "${t}"
-            elif [[ "${t}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-              printf '%s\n' "${t}"
-            else
-              return 1
-            fi
-          }
-          git_tag_from_pep440() {
-            local v="$1"
-            if [[ "${v}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)a([0-9]+)$ ]]; then
-              printf 'v%s-alpha.%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
-            elif [[ "${v}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
-              printf 'v%s\n' "${v}"
-            else
-              return 1
-            fi
-          }
-          PEP440="$(pep440_from_git_tag "${TAG}")" || {
-            echo "tag ${TAG} is not a supported version tag."
-            exit 1
-          }
-          CANONICAL="$(git_tag_from_pep440 "${PY_VERSION}")"
-          if [[ "${PEP440}" != "${PY_VERSION}" || "${TAG}" != "${CANONICAL}" ]]; then
-            echo "tag ${TAG} (PEP 440 ${PEP440}) must match pyproject ${PY_VERSION} as ${CANONICAL}."
-            exit 1
-          fi
-          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
-          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "version=${VERSION}" >>"${GITHUB_OUTPUT}"
 
       - name: Log in to GHCR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "$GITHUB_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Refuse an existing immutable image tag
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          if docker manifest inspect "${IMAGE}:${VERSION}" >/dev/null 2>&1; then
+            echo "${IMAGE}:${VERSION} already exists; refusing overwrite"
+            exit 1
+          fi
 
       - name: Build tagged image once (no latest)
         env:
@@ -102,39 +68,23 @@ jobs:
           set -euo pipefail
           docker build -t "${IMAGE}:${VERSION}" .
           docker image inspect --format='{{.Id}}' "${IMAGE}:${VERSION}" | tee image-id.txt
-          if docker image inspect "${IMAGE}:latest" >/dev/null 2>&1; then
-            echo "local latest tag must not exist"
-            exit 1
-          fi
+          ! docker image inspect "${IMAGE}:latest" >/dev/null 2>&1
 
       - name: Smoke fake-local lifecycle probes
         env:
           VERSION: ${{ steps.meta.outputs.version }}
         run: |
           set -euo pipefail
-          # Image defaults stay fake/local. Full demo is tests/test_quickstart.py.
-          cid="$(docker run -d --rm --name specmint-smoke \
-            -p 127.0.0.1:18080:8080 \
-            "${IMAGE}:${VERSION}")"
+          cid="$(docker run -d --rm --name specmint-smoke -p 127.0.0.1:18080:8080 "${IMAGE}:${VERSION}")"
           cleanup() { docker stop "${cid}" >/dev/null 2>&1 || true; }
           trap cleanup EXIT
           for _ in $(seq 1 30); do
-            if curl -sf "http://127.0.0.1:18080/healthz" >/tmp/specmint-healthz.json; then
-              break
-            fi
+            curl -sf "http://127.0.0.1:18080/healthz" >/tmp/specmint-healthz.json && break
             sleep 2
           done
           curl -sf "http://127.0.0.1:18080/healthz" | tee /tmp/specmint-healthz.json
           curl -sf "http://127.0.0.1:18080/readyz" | tee /tmp/specmint-readyz.json
-          python3 -c 'import json,pathlib; h=json.loads(pathlib.Path("/tmp/specmint-healthz.json").read_text()); r=json.loads(pathlib.Path("/tmp/specmint-readyz.json").read_text()); assert h["status"]=="ok" and h["service"]=="specmint", h; assert r["status"]=="ok", r'
-
-      - name: SHA-256 checksums of the local image id
-        env:
-          VERSION: ${{ steps.meta.outputs.version }}
-        run: |
-          set -euo pipefail
-          sha256sum image-id.txt > image-id.SHA256SUMS
-          cat image-id.txt image-id.SHA256SUMS
+          python3 -c 'import json,pathlib; h=json.loads(pathlib.Path("/tmp/specmint-healthz.json").read_text()); r=json.loads(pathlib.Path("/tmp/specmint-readyz.json").read_text()); assert h["status"]=="ok" and h["service"]=="specmint"; assert r["status"]=="ok"'
 
       - name: Vulnerability scan (trivy/grype if present)
         env:
@@ -157,24 +107,13 @@ jobs:
           set -euo pipefail
           docker push "${IMAGE}:${VERSION}"
           docker inspect --format='{{index .RepoDigests 0}}' "${IMAGE}:${VERSION}" | tee image-digest.txt
-          if grep -E ':latest$|:stable$' image-digest.txt; then
-            echo "refusing latest/stable digest line"
-            exit 1
-          fi
 
       - name: Record digest
         id: digest
-        env:
-          VERSION: ${{ steps.meta.outputs.version }}
         run: |
-          set -euo pipefail
-          REF="$(docker inspect --format='{{index .RepoDigests 0}}' "${IMAGE}:${VERSION}")"
-          DIGEST="${REF#*@}"
-          if [[ "${DIGEST}" != sha256:* ]]; then
-            echo "missing repo digest after push"
-            exit 1
-          fi
-          echo "digest=${DIGEST}" >> "${GITHUB_OUTPUT}"
+          DIGEST="$(cut -d@ -f2 image-digest.txt)"
+          [[ "${DIGEST}" == sha256:* ]]
+          echo "digest=${DIGEST}" >>"${GITHUB_OUTPUT}"
 
       - name: SBOM
         uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
@@ -194,15 +133,3 @@ jobs:
           subject-name: ghcr.io/opsdevcode/specmint
           subject-digest: ${{ steps.digest.outputs.digest }}
           push-to-registry: true
-
-      - name: Sign (best effort)
-        env:
-          VERSION: ${{ steps.meta.outputs.version }}
-        run: |
-          set -euo pipefail
-          TARGET="${IMAGE}:${VERSION}"
-          if command -v cosign >/dev/null 2>&1; then
-            cosign sign --yes "${TARGET}"
-          else
-            echo "cosign not installed on runner; skip signing"
-          fi

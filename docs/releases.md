@@ -1,98 +1,58 @@
 # SpecMint releases
 
-Internal service SemVer. Distinct from specification contract versions.
+SpecMint uses service SemVer independently from its versioned protocol and
+schema contracts. Mint (`opsdevcode/specmint-language`) is the language and
+entry product; SpecMint is the governed runtime.
 
 | Version family | Example | Meaning |
 | --- | --- | --- |
-| Service (PEP 440) | `0.1.0a3` in `pyproject.toml` | SpecMint process / distribution |
-| Git tag | `v0.1.0-alpha.3` | Canonical publish tag |
+| Service SemVer | `0.1.0-alpha.3` | Source and GitHub release version |
+| Python normalized | `0.1.0a3` | Wheel/sdist metadata |
+| Git tag | `v0.1.0-alpha.3` | Immutable Release Please tag |
 | GHCR tag | `0.1.0-alpha.3` | `ghcr.io/opsdevcode/specmint:0.1.0-alpha.3` |
-| Spec contract | `specs.opsdevcode.io/v1alpha1` | `DeliverySpecification` |
-| Compiled intent | `intents.opsdevcode.io/v1alpha1` | `CompiledIntent` |
-| Automation contract | `automations.opsdevcode.io/v1alpha1` | `AutomationSpecification` / `AutomationIntent` |
-| IR | `ir.opsdevcode.io/v1alpha1` | `SpecMintIR` |
-| Mint Language | `v1alpha1` | authoring front-end; lowers to automation |
-
-`opsdevcode_specmint.version.service_version()` is the runtime value. It reads
-the installed distribution, then `pyproject.toml`. Do not invent a second
-manual version in Docker or workflows. `__version__` is that same function.
-
-Mint (`opsdevcode/specmint-language`) is the language and entry product.
-SpecMint is the governed runtime. Keep virtualenvs separate; both packages
-currently expose a `mint` command.
+| Protocol | `mint.integration/v0` | Mint Integration Protocol |
 
 This public preview is **not** production-ready. There is no `mint apply`.
-Do **not** tag `v1.0.0`. An accidental `v1.0.0-alpha.1` GitHub tag exists
-and is not current; do not recreate, force-push, or publish from it.
+Do not tag or publish `latest`, `stable`, or `1.x` while the alpha channel is
+active. `v0.1.0-alpha.2` remains immutable and incomplete: it has source
+archives only and no GHCR image.
 
-`v0.1.0-alpha.2` is retained as an immutable, incomplete prerelease: its
-GitHub Release contains source archives only and its container smoke test
-failed before any GHCR push. Use `v0.1.0-alpha.3` or newer.
+## Automated release train
 
-## Trigger
+Humans and local scripts do not calculate or push release tags.
 
-Push the canonical git tag `vMAJOR.MINOR.PATCH` or
-`vMAJOR.MINOR.PATCH-alpha.N` (example: `v0.1.0-alpha.3` for PEP 440
-`0.1.0a3`). Mapping is strict: the tag must match `project.version`.
+1. Every product PR title and commit follows Conventional Commits.
+2. Merged `fix:` commits contribute fixes; `feat:` contributes features; a
+   `!` or `BREAKING CHANGE:` records a breaking change.
+3. During the alpha channel, Release Please's prerelease strategy advances
+   the immutable `0.1.0-alpha.N` sequence while preserving those categories
+   in the changelog.
+4. The Release Train workflow maintains a protected release PR containing
+   the version, changelog, and manifest update.
+5. Merging that green release PR is the release approval. Release Please
+   creates the canonical tag and GitHub prerelease.
+6. The release event builds and tests the Python artifacts and publishes the
+   immutable GHCR tag. The container workflow never pushes `latest`.
 
-The [Release](../.github/workflows/release.yml) workflow then:
+Release Please uses a one-hour GitHub App installation token scoped to only
+`opsdevcode/specmint-platform`, with only contents, issues, metadata, and pull
+request permissions. This lets generated PRs receive the repository's normal
+required checks; no PAT is used.
 
-1. Refuses `latest`, `stable`, and `1.*` tags.
-2. Fails closed if a GitHub Release for that tag (or the PEP 440
-   equivalent) already exists. It does not rebuild or overwrite
-   `v0.1.0-alpha.1`.
-3. Builds sdist and wheel **once**, tests those exact artifacts in
-   isolated Python 3.12 virtualenvs, writes SHA-256 checksums, generates
-   an SBOM, and attests the artifacts.
-4. Attaches the tested files to a GitHub **prerelease**.
+## Boundaries
 
-`workflow_dispatch` is allowed only when the ref is already that version
-tag.
+- The Platform distribution is `opsdevcode-specmint`; it is not published to
+  the PyPI project `specmint`, which belongs to the Mint language CLI.
+- Published GitHub assets are sdist, wheel, checksums, SBOM, and attestations.
+- The GHCR image is fake/local by default and does not enable live providers.
+- Contract versions do not automatically track the service SemVer.
+- Promoting from alpha or publishing a stable/latest alias requires a separate
+  reviewed change to the release configuration.
 
-The [Container](../.github/workflows/container.yml) workflow is also
-tag-driven. It builds `ghcr.io/opsdevcode/specmint:${TAG#v}` once, smokes
-`/healthz` and `/readyz` against the fake/local image defaults, records
-checksums, generates an SBOM, attests the image, and pushes **only** the
-immutable version tag. It never pushes `latest` or `stable`.
+## One-time credential setup
 
-Rejected: `latest`, `v1`, `v1.0.0-rc.1`, `stable`, and any tag that does
-not match the installed service version.
-
-## What this path does not do
-
-- It does **not** publish to the PyPI project `specmint`. That name is
-  the Mint language CLI. This distribution is `opsdevcode-specmint`.
-  `upload_to_pypi` stays false. There is no `PYPI_TOKEN`.
-- It does **not** push `latest`.
-- It does **not** evaluate caller CUE, call live providers, or add
-  `mint apply`.
-
-## GHCR visibility (owner action)
-
-The workflow authenticates with `GITHUB_TOKEN` and `packages: write`.
-Package **visibility** (public vs private) is an org-owner GitHub
-setting. If anonymous pull of
-`ghcr.io/opsdevcode/specmint:0.1.0-alpha.3` returns 401, an owner must
-make that package public. Do not weaken workflow permissions to work
-around a private package.
-
-## First 0.x tag gate
-
-Do **not** tag `v1.0.0`. `make release-check` prints the canonical tag
-for the current `project.version` and refuses a `1.x` version.
-
-Before pushing the tag:
-
-1. `git fetch origin --tags` — confirm the canonical tag does not exist.
-2. `project.version` in `pyproject.toml` matches the intended PEP 440
-   value (currently `0.1.0a3`).
-3. Required checks on that `origin/main` commit are green.
-4. A maintainer explicitly decides to cut the release.
-
-```bash
-git fetch origin --tags
-make release-check    # prints v0.1.0-alpha.3; does not tag
-git checkout "$(git rev-parse origin/main)"
-git tag "v0.1.0-alpha.3"
-# push that tag only after the decision above
-```
+Repository owners must make the organization secret
+`REPAVE_GITHUB_APP_PRIVATE_KEY` available to this repository. The existing
+`repave-opsdevcode` App installation already covers the organization; the
+workflow downscopes each token to this repository and the explicit permissions
+above. Do not add a PAT or copy the private key into source.
