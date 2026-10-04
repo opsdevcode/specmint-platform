@@ -149,7 +149,8 @@ def test_release_train_and_artifact_workflow() -> None:
     assert '"prerelease-type": "alpha"' in config
     assert '"prerelease": true' in config
     assert '"skip-labeling": true' in config
-    assert '"0.1.0-alpha.2"' in manifest
+    assert set(manifest) == {"."}
+    assert re.fullmatch(r"0\.\d+\.\d+-alpha\.\d+", manifest["."])
     assert "release:" in publish and "- published" in publish
     assert "tags:" not in publish
     assert "workflow_dispatch:" not in publish
