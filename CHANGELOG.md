@@ -16,6 +16,17 @@ Release-recovery alpha for the public SpecMint Platform preview.
 - Retains `v0.1.0-alpha.2` unchanged as an incomplete prerelease; its
   GitHub Release contains source archives only and no GHCR image was pushed.
 
+## [0.1.1-alpha.2](https://github.com/opsdevcode/specmint-platform/compare/v0.1.0-alpha.2...v0.1.1-alpha.2) (2026-10-04)
+
+
+### Bug Fixes
+
+* **container:** recover SpecMint Platform as alpha.3 ([#8](https://github.com/opsdevcode/specmint-platform/issues/8)) ([39589cc](https://github.com/opsdevcode/specmint-platform/commit/39589ccf1b9a00a534727e423ba5b3ac0d5ceb0f))
+* **release:** derive versioned surfaces automatically ([#11](https://github.com/opsdevcode/specmint-platform/issues/11)) ([9ca6fe7](https://github.com/opsdevcode/specmint-platform/commit/9ca6fe7efddb4cd6fbabd6b029c1865f70cc10b6))
+* **release:** replace openapi extra-files with pep440 version ([#14](https://github.com/opsdevcode/specmint-platform/issues/14)) ([4046ea0](https://github.com/opsdevcode/specmint-platform/commit/4046ea0a844539967a43e39b8f39eefa3ae90132))
+* **release:** use git-legal release-please component ([#12](https://github.com/opsdevcode/specmint-platform/issues/12)) ([c085616](https://github.com/opsdevcode/specmint-platform/commit/c0856169c55adf2ab45ed3ff1b31d1982aec56b4))
+* **release:** use granted app permissions ([6961bff](https://github.com/opsdevcode/specmint-platform/commit/6961bff13ceca0fad797ca5dc2e2ffd9b24c97fd))
+
 ## 0.1.0-alpha.2 — 2026-10-02
 
 Integration Protocol v0 governed realization lifecycle.
