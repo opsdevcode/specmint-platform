@@ -137,9 +137,7 @@ def test_release_train_and_artifact_workflow() -> None:
     publish = (REPO_ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
     train = (REPO_ROOT / ".github" / "workflows" / "release-train.yml").read_text(encoding="utf-8")
     config = (REPO_ROOT / "release-please-config.json").read_text(encoding="utf-8")
-    manifest = json.loads(
-        (REPO_ROOT / ".release-please-manifest.json").read_text(encoding="utf-8")
-    )
+    manifest = json.loads((REPO_ROOT / ".release-please-manifest.json").read_text(encoding="utf-8"))
     assert "branches:" in train and "- main" in train
     assert "googleapis/release-please-action@" in train
     assert "actions/create-github-app-token@" in train
