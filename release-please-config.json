@@ -4,7 +4,7 @@
     ".": {
       "release-type": "python",
       "package-name": "opsdevcode-specmint",
-      "component": "SpecMint Platform",
+      "component": "SpecMint",
       "include-v-in-tag": true,
       "include-component-in-tag": false,
       "prerelease": true,
