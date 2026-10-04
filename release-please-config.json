@@ -10,6 +10,13 @@
       "prerelease": true,
       "prerelease-type": "alpha",
       "versioning-strategy": "prerelease",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "docs/openapi.json",
+          "jsonpath": "$.info.version"
+        }
+      ],
       "skip-labeling": true
     }
   }
