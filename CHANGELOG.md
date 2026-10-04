@@ -16,6 +16,13 @@ Release-recovery alpha for the public SpecMint Platform preview.
 - Retains `v0.1.0-alpha.2` unchanged as an incomplete prerelease; its
   GitHub Release contains source archives only and no GHCR image was pushed.
 
+## [0.1.2-alpha.2](https://github.com/opsdevcode/specmint-platform/compare/v0.1.1-alpha.2...v0.1.2-alpha.2) (2026-10-04)
+
+
+### Bug Fixes
+
+* **release:** install pinned cue in publish quality ([#15](https://github.com/opsdevcode/specmint-platform/issues/15)) ([5bce595](https://github.com/opsdevcode/specmint-platform/commit/5bce595b0b8e0ba670040925fd06df0083072bbc))
+
 ## [0.1.1-alpha.2](https://github.com/opsdevcode/specmint-platform/compare/v0.1.0-alpha.2...v0.1.1-alpha.2) (2026-10-04)
 
 

@@ -1,6 +1,6 @@
 [project]
 name = "opsdevcode-specmint"
-version = "0.1.1-alpha.2"
+version = "0.1.2-alpha.2"
 description = "SpecMint core: HTTP API, compile, snapshots, plan, lifecycle, fake providers."
 readme = "README.md"
 license = { text = "Apache-2.0" }
