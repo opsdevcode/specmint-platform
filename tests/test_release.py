@@ -161,6 +161,9 @@ def test_release_train_and_artifact_workflow() -> None:
     assert "tags:" not in publish
     assert "workflow_dispatch:" not in publish
     assert "python -m build --sdist --wheel" in publish
+    assert "bash scripts/install-cue.sh" in publish
+    assert "make cue-check PYTHON=python" in publish
+    assert "CUE_BIN: ${{ github.workspace }}/tools/cue" in publish
     assert "gh release create" not in publish
     assert "git tag" not in publish
     assert "pypa/gh-action-pypi-publish" not in publish
