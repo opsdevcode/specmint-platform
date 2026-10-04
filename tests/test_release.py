@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 from pathlib import Path
 
 import pytest
@@ -135,7 +137,7 @@ def test_release_train_and_artifact_workflow() -> None:
     publish = (REPO_ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
     train = (REPO_ROOT / ".github" / "workflows" / "release-train.yml").read_text(encoding="utf-8")
     config = (REPO_ROOT / "release-please-config.json").read_text(encoding="utf-8")
-    manifest = (REPO_ROOT / ".release-please-manifest.json").read_text(encoding="utf-8")
+    manifest = json.loads((REPO_ROOT / ".release-please-manifest.json").read_text(encoding="utf-8"))
     assert "branches:" in train and "- main" in train
     assert "googleapis/release-please-action@" in train
     assert "actions/create-github-app-token@" in train
@@ -145,7 +147,8 @@ def test_release_train_and_artifact_workflow() -> None:
     assert '"prerelease-type": "alpha"' in config
     assert '"prerelease": true' in config
     assert '"skip-labeling": true' in config
-    assert '"0.1.0-alpha.2"' in manifest
+    assert set(manifest) == {"."}
+    assert re.fullmatch(r"0\.\d+\.\d+-alpha\.\d+", manifest["."])
     assert "release:" in publish and "- published" in publish
     assert "tags:" not in publish
     assert "workflow_dispatch:" not in publish
