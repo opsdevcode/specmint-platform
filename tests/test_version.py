@@ -18,4 +18,4 @@ def test_service_version_matches_pyproject() -> None:
 
 def test_openapi_doc_version_matches_service() -> None:
     payload = json.loads((REPO_ROOT / "docs" / "openapi.json").read_text(encoding="utf-8"))
-    assert payload["info"]["version"] == "0.1.0a3"
+    assert payload["info"]["version"] == service_version()
