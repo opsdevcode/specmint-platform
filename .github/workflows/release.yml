@@ -51,9 +51,16 @@ jobs:
           echo "pep440=${SEMVER/-alpha./a}" >>"${GITHUB_OUTPUT}"
           echo "tag=${TAG}" >>"${GITHUB_OUTPUT}"
 
+      - name: Install pinned CUE
+        run: bash scripts/install-cue.sh
+
+      - name: Verify CUE pin
+        run: make cue-check PYTHON=python
+
       - name: Quality
         env:
           PYTHONPATH: src
+          CUE_BIN: ${{ github.workspace }}/tools/cue
         run: |
           pip install --no-cache-dir -e ".[dev]"
           ruff check src tests
