@@ -147,6 +147,14 @@ def test_release_train_and_artifact_workflow() -> None:
     assert '"prerelease-type": "alpha"' in config
     assert '"prerelease": true' in config
     assert '"skip-labeling": true' in config
+    extra_files = json.loads(config)["packages"]["."]["extra-files"]
+    assert extra_files == [
+        {
+            "type": "json",
+            "path": "docs/openapi.json",
+            "jsonpath": "$.info.version",
+        }
+    ]
     assert set(manifest) == {"."}
     assert re.fullmatch(r"0\.\d+\.\d+-alpha\.\d+", manifest["."])
     assert "release:" in publish and "- published" in publish
