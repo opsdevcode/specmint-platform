@@ -35,8 +35,7 @@ Humans and local scripts do not calculate or push release tags.
    immutable GHCR tag. The container workflow never pushes `latest`.
 
 Release Please uses a one-hour GitHub App installation token scoped to only
-`opsdevcode/specmint-platform`, with only contents, issues, metadata, and pull
-request permissions. This lets generated PRs receive the repository's normal
+`opsdevcode/specmint-platform`, with only contents, metadata, and pull request permissions. This lets generated PRs receive the repository's normal
 required checks; no PAT is used.
 
 ## Boundaries

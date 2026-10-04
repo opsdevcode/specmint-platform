@@ -9,8 +9,8 @@
       "include-component-in-tag": false,
       "prerelease": true,
       "prerelease-type": "alpha",
-      "versioning-strategy": "prerelease"
+      "versioning-strategy": "prerelease",
+      "skip-labeling": true
     }
   }
 }
-

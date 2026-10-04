@@ -140,9 +140,11 @@ def test_release_train_and_artifact_workflow() -> None:
     assert "googleapis/release-please-action@" in train
     assert "actions/create-github-app-token@" in train
     assert "repositories: specmint-platform" in train
+    assert "permission-issues:" not in train
     assert '"versioning-strategy": "prerelease"' in config
     assert '"prerelease-type": "alpha"' in config
     assert '"prerelease": true' in config
+    assert '"skip-labeling": true' in config
     assert '"0.1.0-alpha.2"' in manifest
     assert "release:" in publish and "- published" in publish
     assert "tags:" not in publish

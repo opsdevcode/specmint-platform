@@ -29,7 +29,6 @@ jobs:
           owner: opsdevcode
           repositories: specmint-platform
           permission-contents: write
-          permission-issues: write
           permission-metadata: read
           permission-pull-requests: write
 
