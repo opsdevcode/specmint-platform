@@ -13,6 +13,7 @@ from tests.integration.harness_platform_server import start_platform_server
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "demo_fake_lifecycle.py"
+PINNED = ROOT / "scripts" / "demo_pinned_integration.py"
 
 
 def test_quickstart_can_repeat_without_private_products(tmp_path: Path, monkeypatch) -> None:
@@ -111,6 +112,43 @@ def test_demo_refuses_nonlocal_or_credentialed_urls(base_url: str, tmp_path: Pat
     assert list(tmp_path.iterdir()) == []
 
 
+def test_pinned_integration_demo_records_local_digest(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("SPECMINT_ALLOW_MEMORY_STORE", "1")
+    monkeypatch.delenv("SPECMINT_REQUIRE_DATABASE", raising=False)
+    server = start_platform_server("", fixture_secret="quickstart-test-fixture-only")
+    try:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(PINNED),
+                "--base-url",
+                server.base_url,
+                "--output-dir",
+                str(tmp_path),
+            ],
+            env={**os.environ, "SPECMINT_FIXTURE_IDENTITY_SECRET": server.fixture_secret},
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "Pinned integration" in result.stdout
+        assert "mint apply" not in result.stdout.lower()
+        runs = sorted(tmp_path.iterdir())
+        assert len(runs) == 1
+        pin = json.loads((runs[0] / "integration-pin.json").read_text(encoding="utf-8"))
+        assert pin["identity"] == "local.sandbox.ensure_marker"
+        assert pin["network"] is False
+        assert pin["executed"] is False
+        assert pin["installed"] is False
+        assert pin["artifactDigest"].startswith("sha256:")
+        assert pin["manifestDigest"].startswith("sha256:")
+        assert (runs[0] / "summary.json").is_file()
+    finally:
+        server.stop()
+
+
 def test_quickstart_docs_name_lifecycle_and_unpinned_checkout() -> None:
     text = (ROOT / "docs" / "quickstart.md").read_text(encoding="utf-8")
     assert "approval" in text
@@ -124,3 +162,5 @@ def test_quickstart_docs_name_lifecycle_and_unpinned_checkout() -> None:
     ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
     assert "Fake lifecycle demo" in ci
     assert "tests/test_quickstart.py" in ci
+    assert "demo_pinned_integration.py" in (ROOT / "docs" / "quickstart.md").read_text()
+    assert "integration-pin.json" in (ROOT / "docs" / "quickstart.md").read_text()
