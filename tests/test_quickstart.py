@@ -39,6 +39,10 @@ def test_quickstart_can_repeat_without_private_products(tmp_path: Path, monkeypa
             assert result.returncode == 0, result.stdout + result.stderr
             assert "FAKE / LOCAL ONLY" in result.stdout
             assert "simulated" in result.stdout.lower()
+            lowered = result.stdout.lower()
+            for term in ("plan", "approval", "execution", "verification", "evidence"):
+                assert term in lowered
+            assert "mint apply" not in lowered
             assert server.fixture_secret not in result.stdout + result.stderr
         runs = sorted(tmp_path.iterdir())
         assert len(runs) == 2
@@ -105,3 +109,18 @@ def test_demo_refuses_nonlocal_or_credentialed_urls(base_url: str, tmp_path: Pat
     assert result.returncode == 2
     assert "use a loopback URL" in result.stderr
     assert list(tmp_path.iterdir()) == []
+
+
+def test_quickstart_docs_name_lifecycle_and_unpinned_checkout() -> None:
+    text = (ROOT / "docs" / "quickstart.md").read_text(encoding="utf-8")
+    assert "approval" in text
+    assert "execution" in text
+    assert "verification" in text
+    assert "evidence" in text
+    assert "mint apply" in text
+    assert "0.1.0a3" not in text
+    assert "v0.1.0-alpha.3" not in text
+    assert "Release Please owns prerelease tags" in text
+    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "Fake lifecycle demo" in ci
+    assert "tests/test_quickstart.py" in ci

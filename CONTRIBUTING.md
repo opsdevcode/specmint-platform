@@ -9,4 +9,9 @@ make format && make quality && make test
 ```
 
 Do not add live providers, `mint apply`, or ambient-credential GitHub clients
-to the default distribution. Do not claim production-ready.
+to the default distribution. Do not claim production-ready. Release Please
+owns prerelease tags; do not run `git tag` or `gh release create`.
+
+The fake-provider lifecycle demo is `scripts/demo_fake_lifecycle.py`
+(plan → approval → execution → verification → evidence). See
+[docs/quickstart.md](docs/quickstart.md).

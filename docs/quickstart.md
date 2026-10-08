@@ -1,21 +1,22 @@
 # Run your first governed change locally
 
 Use the public SpecMint core to turn Mint intent into a plan, refuse an
-unapproved run, approve it as another fixture identity, execute with a fake
-provider, retry safely, and inspect simulated verification and evidence.
+unapproved run, record approval as another fixture identity, execute with a
+fake provider, retry safely, and inspect simulated verification and evidence.
 
 Mint (`opsdevcode/specmint-language`) is the language and entry product.
-SpecMint is the governed runtime in this repository. Keep this environment
-separate from a Mint-language-only installation; both packages currently
-provide the `mint` command.
+SpecMint is the governed runtime in this repository. The language
+[ten-minute quickstart](https://github.com/opsdevcode/specmint-language/blob/main/docs/quickstart.md)
+stops at compile, plan, and `mint integrations test`. This repository
+continues: approval, fake/local execution, verification, and evidence.
+Keep this environment separate from a Mint-language-only installation; both
+packages currently provide the `mint` command. There is no `mint apply`.
 
 You need Git and Python **3.12** on macOS or Linux. You do not need Repave,
 another OpsDevCode product, a GitHub account, cloud credentials, or Docker
-for this first walkthrough. The commands below use the source checkout;
+for this first walkthrough. The commands below use this git checkout;
 they do not depend on PyPI, GitHub Pages, or public container availability.
-Use this guide from the same revision as the scripts (`0.1.0a3` /
-`v0.1.0-alpha.3`). The original `v0.1.0-alpha.1` tag contains only the
-earlier snapshot smoke demo.
+Do not pin a superseded tag. Release Please owns prerelease tags.
 
 ## 1. Install in an isolated environment
 
@@ -69,11 +70,11 @@ against the same API without reusing an earlier approval.
 
 Expected sequence:
 
-1. Compile the intent and plan a settings change.
-2. Attempt execution without approval; expect `PLATFORM_EXECUTION`.
-3. Approve the plan as a separate fixture identity and execute the fake change.
+1. Plan: compile the Mint intent and emit operations.
+2. Execution without approval is refused (`PLATFORM_EXECUTION`).
+3. Approval is recorded as a separate fixture identity; fake execution runs.
 4. Repeat the same execution request; receive the existing result with `duplicate: true`.
-5. Request simulated verification and collect an evidence envelope.
+5. Simulated verification, then an evidence envelope.
 
 The script exits nonzero if an expected response or outcome is missing.
 It prints the directory containing its actual inputs and API responses:

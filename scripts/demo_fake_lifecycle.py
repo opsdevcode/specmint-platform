@@ -120,7 +120,9 @@ def run_demo(client: httpx.Client, *, secret: str, output_root: Path) -> Path:
     )
     _require(planned["outcomes"]["change"] > 0, "example must propose a settings change")
     _save(directory, "plan", planned)
-    print(f"1. Compiled intent and planned {planned['outcomes']['change']} change(s).")
+    print(
+        f"1. Plan: compiled Mint intent and planned {planned['outcomes']['change']} operation(s)."
+    )
 
     operations = [
         operation
@@ -138,7 +140,7 @@ def run_demo(client: httpx.Client, *, secret: str, output_root: Path) -> Path:
     rejected = _req(client, "POST", "/runs", executor, request, expected_status=422)
     _require(rejected.get("code") == "PLATFORM_EXECUTION", "expected missing-approval refusal")
     _save(directory, "rejected-before-approval", rejected)
-    print("2. Execution without an accepted approval was refused (PLATFORM_EXECUTION).")
+    print("2. Execution without approval was refused (PLATFORM_EXECUTION).")
 
     approval = _req(
         client,
@@ -163,7 +165,7 @@ def run_demo(client: httpx.Client, *, secret: str, output_root: Path) -> Path:
     )
     _require(run["snapshotDigest"] != planned["snapshotDigest"], "fake state did not change")
     _save(directory, "run", run)
-    print("3. A separate fixture approver approved the plan; fake execution succeeded.")
+    print("3. Approval recorded; fake execution succeeded.")
 
     duplicate = _req(client, "POST", "/runs", executor, request)
     _require(
@@ -211,7 +213,7 @@ def run_demo(client: httpx.Client, *, secret: str, output_root: Path) -> Path:
             "verification": "simulated",
         },
     )
-    print("5. Simulated verification and evidence saved; this is not a live compliance check.")
+    print("5. Verification (simulated) and evidence saved; not a live compliance check.")
     print(f"Inspect the input and API responses in {directory}")
     return directory
 

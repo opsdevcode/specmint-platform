@@ -29,6 +29,9 @@ def test_pins_match_bytes() -> None:
     assert schema_digest() == pins["schemas"]["mint.integration.v0.json"]
     assert artifact_digest() == pins["artifact"]
     assert pins["owner"] == "opsdevcode/specmint-language"
+    revision = pins["ownerRevision"]
+    assert len(revision) == 40
+    assert all(ch in "0123456789abcdef" for ch in revision)
 
 
 def test_governed_lifecycle_is_deterministic(tmp_path: Path) -> None:
