@@ -49,6 +49,11 @@ jobs:
           PYTHONPATH: src
           CUE_BIN: ${{ github.workspace }}/tools/cue
         run: python -m pytest -q -m "not integration" --strict-markers
+      - name: Fake lifecycle demo
+        env:
+          PYTHONPATH: src
+          CUE_BIN: ${{ github.workspace }}/tools/cue
+        run: python -m pytest -q --strict-markers tests/test_quickstart.py
 
   integration:
     name: Platform PostgreSQL integration

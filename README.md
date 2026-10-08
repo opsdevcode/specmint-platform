@@ -23,11 +23,12 @@ Start with [your first governed local change](docs/quickstart.md). Install
 the public source in a Python 3.12 virtual environment, start a loopback
 API, and run `python scripts/demo_fake_lifecycle.py`.
 
-The walkthrough compiles intent, plans a change, demonstrates refusal
-without approval, executes through a fake provider, retries the request,
-and saves simulated verification and evidence for inspection. No Repave
-installation, private credentials, cloud account, or Docker is required.
-All changes are fictional; this is not live execution or a compliance audit.
+The walkthrough compiles Mint intent, produces a plan, demonstrates
+refusal without approval, records approval, executes through a fake
+provider, retries the request, and saves simulated verification and
+evidence. No Repave installation, private credentials, cloud account, or
+Docker is required. All changes are fictional; this is not live execution
+or a compliance audit.
 
 The guide also includes an optional PostgreSQL/Compose path built from
 source. For development checks, see [Contributing](CONTRIBUTING.md).
@@ -56,7 +57,7 @@ OpenAPI: `GET /openapi.json`.
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
-Public preview **0.1.0a3** (tag `v0.1.0-alpha.3`).
-Image `ghcr.io/opsdevcode/specmint:0.1.0-alpha.3` (no `latest`).
+Public preview. The checkout version is `pyproject.toml`. Release Please
+owns prerelease tags. GHCR images use that immutable tag (no `latest`).
 Distribution `opsdevcode-specmint` is not published to the PyPI project
 `specmint`.

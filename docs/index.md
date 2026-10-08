@@ -15,6 +15,6 @@ in this repository.
 - [Platform ADRs](adr/013-platform-service-boundary.md)
 
 Hosted SpecMint remains private. This extract is not production-ready.
-`mint apply` is not included. Image
-`ghcr.io/opsdevcode/specmint:0.1.0-alpha.2` (no `latest`). Distribution
-`opsdevcode-specmint` is not published to the PyPI project `specmint`.
+`mint apply` is not included. GHCR images use the Release Please tag
+(no `latest`). Distribution `opsdevcode-specmint` is not published to the
+PyPI project `specmint`.
