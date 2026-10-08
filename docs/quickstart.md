@@ -106,6 +106,22 @@ HTTP addresses only, does not follow redirects, and does not use proxy
 settings for these local requests. If you change the fixture secret on the
 server, set `SPECMINT_FIXTURE_IDENTITY_SECRET` to the same value in terminal two.
 
+## 4. Pinned-integration lifecycle
+
+The same loopback demo can record a local integration pin after the
+fake lifecycle. The pin is data only: identity, version, and SHA-256
+digests. It does not pip-install, execute, or open a GitHub or cloud
+path.
+
+```bash
+python scripts/demo_pinned_integration.py
+```
+
+Inspect `integration-pin.json` next to `summary.json`. `network`,
+`executed`, and `installed` are `false`. Language-side pinning uses
+`mint integrations add` / `verify` and `mint.lock`. Catalog records for
+standalone public integration repos land only after those artifacts exist.
+
 ## What this proves
 
 The public core can exercise its HTTP lifecycle without installing Repave
