@@ -1,0 +1,45 @@
+{
+  "schema": "opsdevcode.release/v0",
+  "repository": "opsdevcode/specmint-platform",
+  "profile": "mint-platform",
+  "canonical": "github-release",
+  "engine": "release-please",
+  "tagPolicy": {
+    "manualTags": false,
+    "retag": false,
+    "pattern": "^v0\\.[0-9]+\\.[0-9]+-alpha\\.[0-9]+$"
+  },
+  "prerelease": {
+    "githubMakeLatest": false
+  },
+  "downstream": {
+    "pypi": {
+      "role": "none"
+    },
+    "ghcr": {
+      "role": "mirror",
+      "latest": false,
+      "visibilityChange": false
+    },
+    "marketplace": {
+      "role": "deferred"
+    },
+    "openvsx": {
+      "role": "deferred"
+    },
+    "pages": {
+      "role": "none"
+    }
+  },
+  "artifacts": [
+    "wheel",
+    "sdist",
+    "sha256sums",
+    "sbom",
+    "image"
+  ],
+  "provenance": {
+    "synthesize": false
+  },
+  "notes": "GHCR is a mirror; package visibility is unchanged by this program."
+}

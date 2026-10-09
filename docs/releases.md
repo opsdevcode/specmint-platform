@@ -55,3 +55,4 @@ Repository owners must make the organization secret
 `repave-opsdevcode` App installation already covers the organization; the
 workflow downscopes each token to this repository and the explicit permissions
 above. Do not add a PAT or copy the private key into source.
+Org policy (`opsdevcode.release/v0`): GitHub Releases are canonical. GHCR is a mirror of the GitHub tag. This program does not change GHCR visibility or publish `latest`. See https://github.com/opsdevcode/.github/blob/main/docs/github-releases.md.
