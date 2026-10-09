@@ -16,6 +16,13 @@ Release-recovery alpha for the public SpecMint Platform preview.
 - Retains `v0.1.0-alpha.2` unchanged as an incomplete prerelease; its
   GitHub Release contains source archives only and no GHCR image was pushed.
 
+## [0.1.4-alpha.2](https://github.com/opsdevcode/specmint-platform/compare/v0.1.3-alpha.2...v0.1.4-alpha.2) (2026-10-09)
+
+
+### Documentation
+
+* add multi-integration governed lifecycle demo ([#21](https://github.com/opsdevcode/specmint-platform/issues/21)) ([f7954af](https://github.com/opsdevcode/specmint-platform/commit/f7954af7ce61a4fdfb9dd09b2444fbbbb24dea46))
+
 ## [0.1.3-alpha.2](https://github.com/opsdevcode/specmint-platform/compare/v0.1.2-alpha.2...v0.1.3-alpha.2) (2026-10-08)
 
 
