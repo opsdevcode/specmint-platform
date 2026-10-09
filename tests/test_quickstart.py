@@ -14,6 +14,7 @@ from tests.integration.harness_platform_server import start_platform_server
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "demo_fake_lifecycle.py"
 PINNED = ROOT / "scripts" / "demo_pinned_integration.py"
+GOVERNED = ROOT / "scripts" / "demo_governed_integrations.py"
 
 
 def test_quickstart_can_repeat_without_private_products(tmp_path: Path, monkeypatch) -> None:
@@ -149,6 +150,47 @@ def test_pinned_integration_demo_records_local_digest(tmp_path: Path, monkeypatc
         server.stop()
 
 
+def test_governed_integrations_demo_pins_local_and_github(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("SPECMINT_ALLOW_MEMORY_STORE", "1")
+    monkeypatch.delenv("SPECMINT_REQUIRE_DATABASE", raising=False)
+    server = start_platform_server("", fixture_secret="quickstart-test-fixture-only")
+    try:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(GOVERNED),
+                "--base-url",
+                server.base_url,
+                "--output-dir",
+                str(tmp_path),
+            ],
+            env={**os.environ, "SPECMINT_FIXTURE_IDENTITY_SECRET": server.fixture_secret},
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "Governed integrations" in result.stdout
+        assert "mint apply" not in result.stdout.lower()
+        runs = sorted(tmp_path.iterdir())
+        assert len(runs) == 1
+        governed = json.loads((runs[0] / "governed-integrations.json").read_text(encoding="utf-8"))
+        identities = [item["identity"] for item in governed["integrations"]]
+        assert identities == ["local.sandbox.ensure_marker", "repo.github.plan"]
+        assert governed["network"] is False
+        assert governed["executed"] is False
+        assert governed["installed"] is False
+        assert governed["mintApply"] is False
+        assert governed["integrations"][1]["planOnly"] is True
+        assert governed["integrations"][0]["artifactDigest"].startswith("sha256:")
+        assert governed["integrations"][1]["tag"] == "v0.2.0-alpha.1"
+        assert "pypi.org" not in json.dumps(governed)
+        assert (runs[0] / "integration-pin.json").is_file()
+    finally:
+        server.stop()
+
+
 def test_quickstart_docs_name_lifecycle_and_unpinned_checkout() -> None:
     text = (ROOT / "docs" / "quickstart.md").read_text(encoding="utf-8")
     assert "approval" in text
@@ -164,3 +206,6 @@ def test_quickstart_docs_name_lifecycle_and_unpinned_checkout() -> None:
     assert "tests/test_quickstart.py" in ci
     assert "demo_pinned_integration.py" in (ROOT / "docs" / "quickstart.md").read_text()
     assert "integration-pin.json" in (ROOT / "docs" / "quickstart.md").read_text()
+    assert "demo_governed_integrations.py" in text
+    assert "governed-integrations.json" in text
+    assert "pypi.org/project/mint-integration" not in text

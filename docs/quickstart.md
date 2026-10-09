@@ -120,7 +120,26 @@ python scripts/demo_pinned_integration.py
 Inspect `integration-pin.json` next to `summary.json`. `network`,
 `executed`, and `installed` are `false`. Language-side pinning uses
 `mint integrations add` / `verify` and `mint.lock`. Catalog records for
-standalone public integration repos land only after those artifacts exist.
+standalone public integration repos bind GitHub Release coordinates.
+
+## 5. Multi-integration governed lifecycle
+
+The same loopback demo can record both the local sandbox pin and the
+plan-only GitHub integration against the recorded GitHub Release digests.
+It does not install PyPI packages, execute integrations, call GitHub, or
+run `mint apply`.
+
+```bash
+python scripts/demo_governed_integrations.py
+```
+
+Inspect `governed-integrations.json`. Both identities keep `network`,
+`executed`, and `installed` false. Canonical wheels:
+
+- `mint-integration-local` `v0.2.0-alpha.1`
+  `sha256:591e1b3ebdd7e4f9373996e0cdeafa62d8fea39d2640ded8270ff2e59c68094d`
+- `mint-integration-github` `v0.2.0-alpha.1`
+  `sha256:3c864b4f5e7298a0a2f52d0680cb5c3eb8ea57a8195e7d9ba628fe3b7b6e60da`
 
 ## What this proves
 
